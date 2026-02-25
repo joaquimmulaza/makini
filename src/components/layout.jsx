@@ -1,0 +1,109 @@
+import { Link, useNavigate } from 'react-router-dom'
+import { Tractor, Menu, LogOut, LayoutDashboard } from 'lucide-react'
+import { Button } from './ui/button.jsx'
+import { useAuth } from '../contexts/AuthContext.jsx'
+
+export function Header() {
+    const { user, profile, signOut } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await signOut();
+        navigate('/login');
+    };
+
+    return (
+        <header className="sticky top-0 z-50 w-full border-b border-makini-clay/20 bg-makini-earth text-white shadow-sm">
+            <div className="container mx-auto flex h-16 items-center justify-between px-4">
+                <Link to="/" className="flex items-center gap-2">
+                    <Tractor className="h-8 w-8 text-makini-lightGreen" />
+                    <span className="font-heading text-xl font-bold tracking-tight">Makini</span>
+                </Link>
+
+                <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <Link to="/buscar" className="transition-colors hover:text-makini-lightGreen">Mercado</Link>
+                    <Link to="/buscar?categoria=equipamento" className="transition-colors hover:text-makini-lightGreen">Equipamentos</Link>
+                    <Link to="/buscar?categoria=servico" className="transition-colors hover:text-makini-lightGreen">Serviços</Link>
+                </nav>
+
+                <div className="flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-2">
+                        {user ? (
+                            <div className="flex items-center gap-4">
+                                <span className="text-sm font-medium text-makini-sand hidden lg:block">
+                                    Olá, {profile?.nome_completo || user.email}
+                                </span>
+                                {profile?.role === 'fornecedor' && (
+                                    <Button variant="ghost" asChild className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+                                        <Link to="/dashboard" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Painel</Link>
+                                    </Button>
+                                )}
+                                {profile?.role === 'agricultor' && (
+                                    <Button variant="ghost" asChild className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+                                        <Link to="/minhas-reservas" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Minhas Reservas</Link>
+                                    </Button>
+                                )}
+                                <Button variant="ghost" onClick={handleLogout} className="text-red-300 hover:bg-red-900/50 hover:text-red-100 flex items-center gap-2">
+                                    <LogOut className="w-4 h-4" /> Sair
+                                </Button>
+                            </div>
+                        ) : (
+                            <>
+                                <Button variant="ghost" asChild className="text-white hover:bg-makini-clay hover:text-white">
+                                    <Link to="/login">Entrar</Link>
+                                </Button>
+                                <Button variant="default" asChild>
+                                    <Link to="/register">Registar</Link>
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                    <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-makini-clay">
+                        <Menu className="h-6 w-6" />
+                    </Button>
+                </div>
+            </div>
+        </header>
+    )
+}
+
+export function Footer() {
+    return (
+        <footer className="bg-makini-earth py-12 text-white">
+            <div className="container mx-auto grid grid-cols-1 gap-8 px-4 md:grid-cols-4">
+                <div className="flex flex-col gap-2">
+                    <Link to="/" className="flex items-center gap-2">
+                        <Tractor className="h-6 w-6 text-makini-lightGreen" />
+                        <span className="font-heading text-lg font-bold">Makini</span>
+                    </Link>
+                    <p className="text-sm text-makini-sand/80 mt-2">
+                        Conectando agricultores angolanos a equipamentos e serviços de alta qualidade.
+                    </p>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <h4 className="font-heading font-semibold text-makini-lightGreen">Plataforma</h4>
+                    <Link to="/buscar?categoria=equipamento" className="text-sm text-makini-sand/80 hover:text-white">Equipamentos Agrícolas</Link>
+                    <Link to="/buscar?categoria=transporte" className="text-sm text-makini-sand/80 hover:text-white">Transportes e Logística</Link>
+                    <Link to="/buscar?categoria=servico" className="text-sm text-makini-sand/80 hover:text-white">Serviços Especializados</Link>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <h4 className="font-heading font-semibold text-makini-lightGreen">Empresa</h4>
+                    <Link to="/sobre" className="text-sm text-makini-sand/80 hover:text-white">Sobre Nós</Link>
+                    <Link to="/como-funciona" className="text-sm text-makini-sand/80 hover:text-white">Como Funciona</Link>
+                    <Link to="/contato" className="text-sm text-makini-sand/80 hover:text-white">Contacto</Link>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <h4 className="font-heading font-semibold text-makini-lightGreen">Legal</h4>
+                    <Link to="/termos" className="text-sm text-makini-sand/80 hover:text-white">Termos de Serviço</Link>
+                    <Link to="/privacidade" className="text-sm text-makini-sand/80 hover:text-white">Política de Privacidade</Link>
+                </div>
+            </div>
+            <div className="mt-12 border-t border-makini-clay/50 pt-8 text-center text-sm text-makini-sand/60">
+                &copy; {new Date().getFullYear()} Makini. Todos os direitos reservados.
+            </div>
+        </footer>
+    )
+}
