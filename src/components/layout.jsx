@@ -1,21 +1,26 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Tractor, Menu, LogOut, LayoutDashboard } from 'lucide-react'
+import { Tractor, Menu, LogOut, LayoutDashboard, X } from 'lucide-react'
 import { Button } from './ui/button.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
 export function Header() {
     const { user, profile, signOut } = useAuth();
     const navigate = useNavigate();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const handleLogout = async () => {
         await signOut();
         navigate('/login');
     };
 
+    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+    const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
     return (
         <header className="sticky top-0 z-50 w-full border-b border-makini-clay/20 bg-makini-earth text-white shadow-sm">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                <Link to="/" className="flex items-center gap-2">
+                <Link to="/" className="flex items-center gap-2" onClick={closeMobileMenu}>
                     <Tractor className="h-8 w-8 text-makini-lightGreen" />
                     <span className="font-heading text-xl font-bold tracking-tight">Makini</span>
                 </Link>
@@ -58,11 +63,54 @@ export function Header() {
                             </>
                         )}
                     </div>
-                    <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-makini-clay">
-                        <Menu className="h-6 w-6" />
+                    <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-makini-clay" onClick={toggleMobileMenu}>
+                        {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </Button>
                 </div>
             </div>
+
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden border-t border-makini-clay/20 bg-makini-earth px-4 py-4 space-y-4 shadow-lg absolute w-full left-0">
+                    <nav className="flex flex-col gap-4 text-sm font-medium">
+                        <Link to="/buscar" className="transition-colors hover:text-makini-lightGreen" onClick={closeMobileMenu}>Mercado</Link>
+                        <Link to={`/buscar?categoria=${encodeURIComponent('Preparação do Solo')}`} className="transition-colors hover:text-makini-lightGreen" onClick={closeMobileMenu}>Preparação do Solo</Link>
+                        <Link to={`/buscar?categoria=${encodeURIComponent('Colheita')}`} className="transition-colors hover:text-makini-lightGreen" onClick={closeMobileMenu}>Colheita</Link>
+                    </nav>
+
+                    <div className="flex flex-col gap-2 pt-4 border-t border-makini-clay/20">
+                        {user ? (
+                            <>
+                                <span className="text-sm font-medium text-makini-sand mb-2 px-2">
+                                    Olá, {profile?.nome_completo || user.email}
+                                </span>
+                                {profile?.role === 'fornecedor' && (
+                                    <Button variant="ghost" asChild className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                        <Link to="/dashboard" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Painel</Link>
+                                    </Button>
+                                )}
+                                {profile?.role === 'agricultor' && (
+                                    <Button variant="ghost" asChild className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                        <Link to="/minhas-reservas" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Minhas Reservas</Link>
+                                    </Button>
+                                )}
+                                <Button variant="ghost" onClick={() => { handleLogout(); closeMobileMenu(); }} className="justify-start px-2 text-red-300 hover:bg-red-900/50 hover:text-red-100 flex items-center gap-2">
+                                    <LogOut className="w-4 h-4" /> Sair
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button variant="ghost" asChild className="justify-start px-2 text-white hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                    <Link to="/login">Entrar</Link>
+                                </Button>
+                                <Button variant="default" asChild className="justify-start px-2 mt-2" onClick={closeMobileMenu}>
+                                    <Link to="/register" className="w-full text-center">Registar</Link>
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </header>
     )
 }
