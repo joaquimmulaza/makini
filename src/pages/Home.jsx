@@ -1,9 +1,12 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
 import { Link } from 'react-router-dom';
-import { Tractor, Plane, Sprout, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button.jsx';
 import { Card, CardContent } from '../components/ui/card.jsx';
+import { supabase } from '../lib/supabase';
+import { CATEGORIAS } from '../lib/categorias';
+import { useState, useEffect } from 'react';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -12,14 +15,24 @@ import 'swiper/css/effect-fade';
 import heroFarmer from '../assets/hero_farmer.png';
 import heroSupplier from '../assets/hero_supplier.png';
 
-const categories = [
-    { id: 'preparacao', name: 'Preparação do Solo', icon: Tractor, count: 45 },
-    { id: 'plantio', name: 'Plantio e Sementeira', icon: Sprout, count: 32 },
-    { id: 'insumos', name: 'Aplicação de Insumos', icon: Plane, count: 18 },
-    { id: 'colheita', name: 'Colheita', icon: Tractor, count: 24 }
-];
 
 export default function Home() {
+    const [counts, setCounts] = useState({});
+
+    useEffect(() => {
+        // Buscar contagem real de anúncios por categoria
+        const fetchCounts = async () => {
+            const { data } = await supabase
+                .from('listings')
+                .select('categoria');
+            if (data) {
+                const c = {};
+                data.forEach(l => { c[l.categoria] = (c[l.categoria] || 0) + 1; });
+                setCounts(c);
+            }
+        };
+        fetchCounts();
+    }, []);
     return (
         <div className="flex flex-col min-h-screen">
 
@@ -94,15 +107,21 @@ export default function Home() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {categories.map((cat) => (
-                            <Link to={`/categoria/${cat.id}`} key={cat.id} className="group">
+                        {CATEGORIAS.map((cat) => (
+                            <Link
+                                to={`/buscar?categoria=${encodeURIComponent(cat.nome)}`}
+                                key={cat.id}
+                                className="group"
+                            >
                                 <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:border-makini-green hover:shadow-lg bg-white">
                                     <CardContent className="flex flex-col items-center p-8 text-center">
                                         <div className="p-4 rounded-full bg-makini-lightGreen/30 text-makini-green mb-6 group-hover:scale-110 transition-transform">
                                             <cat.icon className="h-8 w-8" />
                                         </div>
-                                        <h3 className="font-heading font-semibold text-xl mb-2 text-makini-earth">{cat.name}</h3>
-                                        <p className="text-sm text-makini-clay">{cat.count} anúncios</p>
+                                        <h3 className="font-heading font-semibold text-xl mb-2 text-makini-earth">{cat.nome}</h3>
+                                        <p className="text-sm text-makini-clay">
+                                            {counts[cat.nome] ?? '...'} anúncios
+                                        </p>
                                     </CardContent>
                                 </Card>
                             </Link>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { Card, CardContent } from '../../components/ui/card.jsx';
 import { Button } from '../../components/ui/button.jsx';
 import { Badge } from '../../components/ui/badge.jsx';
@@ -8,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { MapPin, Calendar, Banknote, Sparkles, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import { CATEGORIAS_NOMES } from '../../lib/categorias';
 
 export default function SearchListings() {
     const [searchParams] = useSearchParams();
@@ -32,15 +34,8 @@ export default function SearchListings() {
 
             let query = supabase.from('listings').select('*');
 
-            // Standard UI filters map to category or type if they aren't 'All'
             if (filter !== 'All') {
-                if (filter === 'Transporte') {
-                    query = query.ilike('categoria', '%Transporte%');
-                } else if (filter === 'Prestação de Serviços') {
-                    query = query.eq('categoria', 'Prestação de Serviços');
-                } else {
-                    query = query.ilike('categoria', `%${filter}%`);
-                }
+                query = query.eq('categoria', filter);
             }
 
             const { data, error } = await query;
@@ -56,11 +51,11 @@ export default function SearchListings() {
         fetchListings();
     }, [filter]);
 
-    // Simulated Gemini Call
+    // Simulação de recomendação inteligente
     const simulateGeminiRecommendation = () => {
         setIsSearchingContext(true);
         setTimeout(() => {
-            setFilter('Preparação'); // mock simulation
+            setFilter('Preparação do Solo'); // simulação
             setIsSearchingContext(false);
         }, 1500);
     };
@@ -69,7 +64,7 @@ export default function SearchListings() {
         e.preventDefault();
 
         if (!user || profile?.role !== 'agricultor') {
-            alert('Apenas agricultores registados podem efetuar reservas.');
+            toast.error('Apenas agricultores registados podem efetuar reservas.');
             return;
         }
 
@@ -91,13 +86,13 @@ export default function SearchListings() {
 
             if (error) throw error;
 
-            alert(`Reserva solicitada com sucesso para: ${selectedListing?.titulo}\nFique atento ao seu e-mail para confirmação do fornecedor.`);
+            toast.success(`Reserva solicitada para "${selectedListing?.titulo}"! Aguarde a confirmação do fornecedor.`);
             setSelectedListing(null);
             setReservationDates('');
             setReservationContext('');
         } catch (err) {
             console.error("Reservation Error:", err);
-            alert("Ocorreu um erro ao solicitar a reserva. Tente novamente.");
+            toast.error('Ocorreu um erro ao solicitar a reserva. Tente novamente.');
         } finally {
             setIsSubmitting(false);
         }
@@ -114,7 +109,7 @@ export default function SearchListings() {
                             Encontrar Equipamentos e Serviços
                         </h1>
                         <div className="flex flex-wrap gap-2">
-                            {['All', 'Preparação', 'Plantio', 'Colheita', 'Transporte', 'Prestação de Serviços'].map(f => (
+                            {['All', ...CATEGORIAS_NOMES].map(f => (
                                 <Button
                                     key={f}
                                     variant={filter === f ? 'default' : 'outline'}
@@ -157,12 +152,22 @@ export default function SearchListings() {
                                     >
                                         <Card className="bg-white hover:border-makini-green transition-colors overflow-hidden flex flex-col group h-full">
                                             <div className="h-48 bg-makini-clay/20 flex items-center justify-center relative overflow-hidden">
-                                                <motion.div
-                                                    className="absolute inset-0 bg-makini-earth/10"
-                                                    whileHover={{ scale: 1.1 }}
-                                                    transition={{ duration: 0.4 }}
-                                                />
-                                                <span className="text-makini-clay/50 font-heading tracking-widest text-xl uppercase z-10 relative group-hover:scale-110 transition-transform duration-300">Sem Imagem</span>
+                                                {eq.imagem_url ? (
+                                                    <img
+                                                        src={eq.imagem_url}
+                                                        alt={eq.titulo}
+                                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        <motion.div
+                                                            className="absolute inset-0 bg-makini-earth/10"
+                                                            whileHover={{ scale: 1.1 }}
+                                                            transition={{ duration: 0.4 }}
+                                                        />
+                                                        <span className="text-makini-clay/50 font-heading tracking-widest text-xl uppercase z-10 relative group-hover:scale-110 transition-transform duration-300">Sem Imagem</span>
+                                                    </>
+                                                )}
                                                 <Badge className="absolute top-4 right-4 bg-black/70 hover:bg-black text-white border-0 z-10">
                                                     {eq.categoria}
                                                 </Badge>
@@ -184,7 +189,7 @@ export default function SearchListings() {
                                                     <div className="flex justify-between items-end mt-4 pt-4 border-t border-makini-sand relative">
                                                         <div className="flex items-center text-lg font-bold text-makini-green">
                                                             <Banknote className="w-5 h-5 mr-1" />
-                                                            {Number(eq.preco).toLocaleString()} {eq.unidade_preco || 'kz'}
+                                                            {Number(eq.preco).toLocaleString()} kz
                                                         </div>
                                                         {user && profile?.role === 'agricultor' ? (
                                                             <Dialog open={selectedListing?.id === eq.id} onOpenChange={(open) => {
@@ -204,7 +209,7 @@ export default function SearchListings() {
                                                                         <div className="flex flex-col gap-2 p-3 bg-makini-sand rounded-md mb-2">
                                                                             <span className="font-bold text-makini-earth">{eq.titulo}</span>
                                                                             <span className="text-sm text-makini-clay flex items-center gap-1"><MapPin className="w-3 h-3" /> {eq.localizacao}</span>
-                                                                            <span className="text-sm text-makini-green font-semibold">{Number(eq.preco).toLocaleString()} {eq.unidade_preco || 'kz'}</span>
+                                                                            <span className="text-sm text-makini-green font-semibold">{Number(eq.preco).toLocaleString()} kz</span>
                                                                         </div>
                                                                         <div className="grid gap-2">
                                                                             <label htmlFor="dates" className="text-sm font-medium text-makini-earth">

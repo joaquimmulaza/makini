@@ -22,8 +22,8 @@ export function Header() {
 
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                     <Link to="/buscar" className="transition-colors hover:text-makini-lightGreen">Mercado</Link>
-                    <Link to="/buscar?categoria=equipamento" className="transition-colors hover:text-makini-lightGreen">Equipamentos</Link>
-                    <Link to="/buscar?categoria=servico" className="transition-colors hover:text-makini-lightGreen">Serviços</Link>
+                    <Link to={`/buscar?categoria=${encodeURIComponent('Preparação do Solo')}`} className="transition-colors hover:text-makini-lightGreen">Preparação do Solo</Link>
+                    <Link to={`/buscar?categoria=${encodeURIComponent('Colheita')}`} className="transition-colors hover:text-makini-lightGreen">Colheita</Link>
                 </nav>
 
                 <div className="flex items-center gap-4">
@@ -82,10 +82,11 @@ export function Footer() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <h4 className="font-heading font-semibold text-makini-lightGreen">Plataforma</h4>
-                    <Link to="/buscar?categoria=equipamento" className="text-sm text-makini-sand/80 hover:text-white">Equipamentos Agrícolas</Link>
-                    <Link to="/buscar?categoria=transporte" className="text-sm text-makini-sand/80 hover:text-white">Transportes e Logística</Link>
-                    <Link to="/buscar?categoria=servico" className="text-sm text-makini-sand/80 hover:text-white">Serviços Especializados</Link>
+                    <h4 className="font-heading font-semibold text-makini-lightGreen">Categorias</h4>
+                    <Link to={`/buscar?categoria=${encodeURIComponent('Preparação do Solo')}`} className="text-sm text-makini-sand/80 hover:text-white">Preparação do Solo</Link>
+                    <Link to={`/buscar?categoria=${encodeURIComponent('Plantio e Sementeira')}`} className="text-sm text-makini-sand/80 hover:text-white">Plantio e Sementeira</Link>
+                    <Link to={`/buscar?categoria=${encodeURIComponent('Aplicação de Insumos')}`} className="text-sm text-makini-sand/80 hover:text-white">Aplicação de Insumos</Link>
+                    <Link to={`/buscar?categoria=${encodeURIComponent('Colheita')}`} className="text-sm text-makini-sand/80 hover:text-white">Colheita</Link>
                 </div>
 
                 <div className="flex flex-col gap-2">

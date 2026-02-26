@@ -47,7 +47,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signOut = async () => {
-        await supabase.auth.signOut();
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Erro ao terminar sessão:', error);
+        }
+        setUser(null);
+        setProfile(null);
     };
 
     return (

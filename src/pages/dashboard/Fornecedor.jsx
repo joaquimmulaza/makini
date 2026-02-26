@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Card, CardContent } from '../../components/ui/card.jsx';
 import { Button } from '../../components/ui/button.jsx';
 import { Badge } from '../../components/ui/badge.jsx';
@@ -8,6 +9,8 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
+import { CATEGORIAS_NOMES } from '../../lib/categorias';
+
 
 export default function DashboardFornecedor() {
     const [activeTab, setActiveTab] = useState('reservas'); // 'reservas' | 'anuncios'
@@ -18,18 +21,19 @@ export default function DashboardFornecedor() {
     // New Listing State
     const [showNewListingDialog, setShowNewListingDialog] = useState(false);
     const [isSubmittingListing, setIsSubmittingListing] = useState(false);
+    const [imagemArquivo, setImagemArquivo] = useState(null);
     const [newListingData, setNewListingData] = useState({
         tipo: 'equipamento',
-        categoria: '',
+        categoria: CATEGORIAS_NOMES[0],
         titulo: '',
         capacidade_especificacao: '',
         preco: '',
-        unidade_preco: 'kz / dia',
         disponibilidade: 'imediata',
         localizacao: ''
     });
 
     const { user, profile } = useAuth();
+
 
     useEffect(() => {
         const fetchReservas = async () => {
@@ -91,8 +95,9 @@ export default function DashboardFornecedor() {
 
         if (!error) {
             setReservas(prev => prev.map(r => r.id === id ? { ...r, status: 'aprovada' } : r));
+            toast.success('Reserva aprovada com sucesso!');
         } else {
-            alert("Erro ao aprovar a reserva.");
+            toast.error('Erro ao aprovar a reserva.');
         }
     };
 
@@ -104,49 +109,113 @@ export default function DashboardFornecedor() {
 
         if (!error) {
             setReservas(prev => prev.map(r => r.id === id ? { ...r, status: 'rejeitada' } : r));
+            toast('Reserva rejeitada.', { icon: '🚫' });
         } else {
-            alert("Erro ao rejeitar a reserva.");
+            toast.error('Erro ao rejeitar a reserva.');
         }
     };
 
-    const handleDeleteListing = async (id) => {
-        if (!window.confirm("Tem a certeza que deseja apagar este anúncio?")) return;
-
-        const { error } = await supabase
-            .from('listings')
-            .delete()
-            .eq('id', id);
-
-        if (!error) {
-            setMyListings(prev => prev.filter(l => l.id !== id));
-        } else {
-            alert("Erro ao apagar o anúncio.");
-        }
+    const handleDeleteListing = (id) => {
+        toast(
+            (t) => (
+                <span className="flex flex-col gap-2">
+                    <span className="font-medium">Apagar este anúncio?</span>
+                    <span className="text-sm text-gray-500">Esta ação não pode ser desfeita.</span>
+                    <div className="flex gap-2 mt-1">
+                        <button
+                            onClick={async () => {
+                                toast.dismiss(t.id);
+                                const { error } = await supabase
+                                    .from('listings')
+                                    .delete()
+                                    .eq('id', id);
+                                if (!error) {
+                                    setMyListings(prev => prev.filter(l => l.id !== id));
+                                    toast.success('Anúncio apagado.');
+                                } else {
+                                    toast.error('Erro ao apagar o anúncio.');
+                                }
+                            }}
+                            className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                        >
+                            Apagar
+                        </button>
+                        <button
+                            onClick={() => toast.dismiss(t.id)}
+                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </span>
+            ),
+            { duration: Infinity }
+        );
     };
 
     const handleCreateListing = async (e) => {
         e.preventDefault();
         setIsSubmittingListing(true);
 
+        let imagem_url = null;
+
+        // Upload image to Supabase Storage if a file was selected
+        if (imagemArquivo) {
+            // Validate file size (max 5MB)
+            if (imagemArquivo.size > 5 * 1024 * 1024) {
+                toast.error('A imagem é demasiado grande. Máximo permitido: 5MB.');
+                setIsSubmittingListing(false);
+                return;
+            }
+
+            const fileExt = imagemArquivo.name.split('.').pop().toLowerCase();
+            const fileName = `listing-${user.id}-${Date.now()}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('listings')
+                .upload(fileName, imagemArquivo, { upsert: true });
+
+            if (uploadError) {
+                console.error('Erro ao fazer upload da imagem:', uploadError);
+                toast.error(`Erro no upload: ${uploadError.message}`);
+                setIsSubmittingListing(false);
+                return;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('listings')
+                .getPublicUrl(fileName);
+
+            imagem_url = publicUrl;
+        }
+
         const { data, error } = await supabase
             .from('listings')
             .insert([{
                 fornecedor_id: user.id,
                 nome_empresa: profile?.nome_completo || 'Empresa Fornecedora',
+                imagem_url,
                 ...newListingData
             }])
             .select();
 
         if (error) {
             console.error("Erro a criar anúncio:", error);
-            alert("Ocorreu um erro ao criar o anúncio.");
+            toast.error('Ocorreu um erro ao criar o anúncio.');
         } else if (data) {
             setMyListings(prev => [data[0], ...prev]);
             setShowNewListingDialog(false);
+            setImagemArquivo(null);
             setNewListingData({
-                tipo: 'equipamento', categoria: '', titulo: '', capacidade_especificacao: '', preco: '', unidade_preco: 'kz / dia', disponibilidade: 'imediata', localizacao: ''
+                tipo: 'equipamento',
+                categoria: CATEGORIAS_NOMES[0],
+                titulo: '',
+                capacidade_especificacao: '',
+                preco: '',
+                disponibilidade: 'imediata',
+                localizacao: ''
             });
-            alert("Anúncio criado com sucesso!");
+            toast.success('Anúncio criado com sucesso!');
         }
         setIsSubmittingListing(false);
     };
@@ -267,13 +336,16 @@ export default function DashboardFornecedor() {
                                             </div>
                                             <div className="grid gap-2">
                                                 <label className="text-sm font-medium">Categoria</label>
-                                                <input
-                                                    className="w-full p-2 border border-makini-clay/30 rounded-md"
-                                                    placeholder="Ex: Preparação do Solo"
+                                                <select
+                                                    className="w-full p-2 border border-makini-clay/30 rounded-md bg-white"
                                                     value={newListingData.categoria}
                                                     onChange={e => setNewListingData({ ...newListingData, categoria: e.target.value })}
                                                     required
-                                                />
+                                                >
+                                                    {CATEGORIAS_NOMES.map(cat => (
+                                                        <option key={cat} value={cat}>{cat}</option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </div>
 
@@ -301,7 +373,7 @@ export default function DashboardFornecedor() {
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="grid gap-2">
-                                                <label className="text-sm font-medium">Preço</label>
+                                                <label className="text-sm font-medium">Preço (kz)</label>
                                                 <input
                                                     type="number"
                                                     className="w-full p-2 border border-makini-clay/30 rounded-md"
@@ -311,15 +383,19 @@ export default function DashboardFornecedor() {
                                                     required
                                                 />
                                             </div>
-                                            <div className="grid gap-2">
-                                                <label className="text-sm font-medium">Unidade</label>
-                                                <input
-                                                    className="w-full p-2 border border-makini-clay/30 rounded-md"
-                                                    placeholder="Ex: kz / dia"
-                                                    value={newListingData.unidade_preco}
-                                                    onChange={e => setNewListingData({ ...newListingData, unidade_preco: e.target.value })}
-                                                />
-                                            </div>
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <label className="text-sm font-medium">Imagem do Anúncio</label>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="w-full p-2 border border-makini-clay/30 rounded-md text-sm text-makini-clay file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-makini-sand file:text-makini-earth hover:file:bg-makini-clay/20 cursor-pointer"
+                                                onChange={e => setImagemArquivo(e.target.files?.[0] || null)}
+                                            />
+                                            {imagemArquivo && (
+                                                <p className="text-xs text-makini-green">✓ {imagemArquivo.name}</p>
+                                            )}
                                         </div>
 
                                         <div className="grid gap-2">
@@ -354,7 +430,7 @@ export default function DashboardFornecedor() {
                             <Card className="bg-white border-makini-clay/20 border-dashed">
                                 <CardContent className="p-10 text-center flex flex-col items-center gap-4">
                                     <p className="text-makini-clay text-lg">Ainda não tem nenhum anúncio publicado.</p>
-                                    <Button className="bg-makini-green hover:bg-makini-green/90">Criar o Primeiro Anúncio</Button>
+
                                 </CardContent>
                             </Card>
                         ) : (
@@ -366,9 +442,16 @@ export default function DashboardFornecedor() {
                                                 <h3 className="font-bold text-lg text-makini-earth">{lst.titulo}</h3>
                                                 <Badge variant="outline">{lst.categoria}</Badge>
                                             </div>
+                                            {lst.imagem_url ? (
+                                                <img src={lst.imagem_url} alt={lst.titulo} className="w-full h-32 object-cover rounded-md mb-2" />
+                                            ) : (
+                                                <div className="w-full h-20 bg-makini-sand/50 rounded-md flex items-center justify-center mb-2">
+                                                    <span className="text-xs text-makini-clay/60">Sem imagem</span>
+                                                </div>
+                                            )}
                                             <p className="text-sm text-makini-clay mb-4">{lst.capacidade_especificacao}</p>
                                             <div className="mt-auto pt-4 border-t border-makini-sand flex justify-between items-center">
-                                                <span className="font-semibold text-makini-green">{Number(lst.preco).toLocaleString()} {lst.unidade_preco}</span>
+                                                <span className="font-semibold text-makini-green">{Number(lst.preco).toLocaleString()} kz</span>
                                                 <Button variant="link" onClick={() => handleDeleteListing(lst.id)} className="text-red-500 hover:text-red-700 px-0">Apagar</Button>
                                             </div>
                                         </CardContent>

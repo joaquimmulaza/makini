@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button.jsx';
 import { Card, CardContent } from '../../components/ui/card.jsx';
 import { supabase } from '../../lib/supabase';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -11,11 +12,35 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const { user, profile, loading: authLoading } = useAuth();
+
+    useEffect(() => {
+        // Don't redirect while auth state is loading (e.g., during signOut)
+        if (authLoading) return;
+        if (user && profile) {
+            if (profile.role === 'fornecedor') {
+                navigate('/dashboard');
+            } else {
+                navigate('/buscar');
+            }
+        }
+    }, [user, profile, authLoading, navigate]);
+
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        if (!validateEmail(email)) {
+            setError('Por favor, insira um email válido.');
+            setLoading(false);
+            return;
+        }
 
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
             email,
@@ -59,6 +84,7 @@ export default function Login() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-makini-earth">Email</label>
                             <input
+                                aria-label="Email"
                                 type="email"
                                 required
                                 value={email}
@@ -73,6 +99,7 @@ export default function Login() {
                                 <Link to="#" className="text-xs text-makini-green hover:underline">Esqueceu?</Link>
                             </div>
                             <input
+                                aria-label="Palavra-passe"
                                 type="password"
                                 required
                                 value={password}

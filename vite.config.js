@@ -5,4 +5,9 @@ import * as path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react()],
+    test: {
+        environment: 'jsdom',
+        globals: true,
+        setupFiles: './src/setupTests.js',
+    }
 })

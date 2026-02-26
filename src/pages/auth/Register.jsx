@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Tractor, Plane } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { Button } from '../../components/ui/button.jsx';
 import { Card, CardContent } from '../../components/ui/card.jsx';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Register() {
     const [role, setRole] = useState(null);
@@ -14,6 +16,19 @@ export default function Register() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { user, profile, loading: authLoading } = useAuth();
+
+    useEffect(() => {
+        // Don't redirect while auth state is loading (e.g., during signOut)
+        if (authLoading) return;
+        if (user && profile) {
+            if (profile.role === 'fornecedor') {
+                navigate('/dashboard');
+            } else {
+                navigate('/buscar');
+            }
+        }
+    }, [user, profile, authLoading, navigate]);
 
     const handleSelectRole = (selectedRole) => {
         setRole(selectedRole);
@@ -81,10 +96,21 @@ export default function Register() {
 
     // Registration Form
 
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    };
+
     const handleRegister = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+
+        if (!validateEmail(email)) {
+            setError('Por favor, insira um email válido.');
+            setLoading(false);
+            return;
+        }
 
         try {
             // 1. Sign up user e passar os metadados para o Trigger DB criar o perfil automaticamente
@@ -104,7 +130,7 @@ export default function Register() {
             if (authError) throw authError;
 
             if (authData?.user) {
-                alert('Registo concluído com sucesso! Verifique o seu email (caso a confirmação esteja ativada) ou faça login.');
+                toast.success('Registo concluído! Verifique o seu email e faça login.');
                 navigate('/login');
             }
         } catch (err) {
@@ -135,6 +161,7 @@ export default function Register() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-makini-earth">Nome Completo</label>
                             <input
+                                aria-label="Nome Completo"
                                 type="text"
                                 required
                                 value={name}
@@ -146,6 +173,7 @@ export default function Register() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-makini-earth">Email</label>
                             <input
+                                aria-label="Email"
                                 type="email"
                                 required
                                 value={email}
@@ -157,6 +185,7 @@ export default function Register() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-makini-earth">Palavra-passe</label>
                             <input
+                                aria-label="Palavra-passe"
                                 type="password"
                                 required
                                 value={password}
