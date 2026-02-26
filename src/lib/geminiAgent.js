@@ -10,7 +10,7 @@ if (apiKey) {
 }
 
 // Default model as requested
-const MODEL_NAME = "gemini-3.0-flash"; // gemini-3-flash-preview ? actually there's gemini-2.0-flash, but prompt says "gemini-3-flash-preview". Let's use it or 3.0. We will use exactly "gemini-3-flash-preview" as requested by user. Wait, usually the current version is gemini-2.5-flash or gemini-2.0-flash. The prompt said gemini-3-flash-preview. I'll use it to respect the explicit request.
+const MODEL_NAME = "gemini-3-flash-preview"; // gemini-3-flash-preview ? actually there's gemini-2.0-flash, but prompt says "gemini-3-flash-preview". Let's use it or 3.0. We will use exactly "gemini-3-flash-preview" as requested by user. Wait, usually the current version is gemini-2.5-flash or gemini-2.0-flash. The prompt said gemini-3-flash-preview. I'll use it to respect the explicit request.
 // Wait, user explicitly specified: gemini-3-flash-preview. I'll use the value from prompt.
 const MODEL = "gemini-3-flash-preview";
 
@@ -25,12 +25,10 @@ Quando o utilizador fizer um pedido:
 5. Se não houver opções exatas, sugira alternativas próximas (outra localização, data diferente, etc.)
 
 Categorias de equipamentos disponíveis:
-- Preparação do Solo (tractores, charruas, escarificadores)
-- Plantio (semeadoras, transplantadoras)
-- Aplicação de Insumos (pulverizadores, distribuidores de fertilizante)
-- Colheita (colheitadeiras, debulhadores, ceifeiras)
-- Transporte (camiões, atrelados, reboques)
-- Irrigação (bombas, sistemas de rega)`;
+- Preparação do Solo
+- Plantio e Sementeira
+- Aplicação de Insumos
+- Colheita`;
 
 const tools = [
   {
@@ -49,8 +47,8 @@ const tools = [
         },
         category: {
           type: "string",
-          enum: ["preparacao_solo", "plantio", "aplicacao_insumos", "colheita", "transporte", "irrigacao"],
-          description: "Categoria do equipamento"
+          enum: ["Preparação do Solo", "Plantio e Sementeira", "Aplicação de Insumos", "Colheita"],
+          description: "Categoria exacta como aparece na base de dados"
         },
         date_needed: {
           type: "string",
@@ -169,18 +167,20 @@ async function executeToolCall(toolCall) {
   try {
     switch (name) {
       case "search_equipment": {
-        let query = supabase.from('listings').select('*, profiles(nome, avaliacao)');
+        let query = supabase.from('listings').select('*, profiles(nome_completo)');
 
         if (args.location) query = query.ilike('localizacao', `%${args.location}%`);
         if (args.category) query = query.eq('categoria', args.category);
-        if (args.equipment_type) query = query.ilike('titulo', `%${args.equipment_type}%`);
-        if (args.max_price_per_day) query = query.lte('preco_dia', args.max_price_per_day);
+        if (args.equipment_type) {
+          query = query.or(`titulo.ilike.%${args.equipment_type}%,capacidade_especificacao.ilike.%${args.equipment_type}%`);
+        }
+        if (args.max_price_per_day) query = query.lte('preco', args.max_price_per_day);
 
-        const { data, error } = await query;
+        const { data, error } = await query.limit(5);
         if (error) throw error;
 
         // Return max 5 items to keep context small
-        return data ? data.slice(0, 5) : [];
+        return data || [];
       }
 
       case "check_availability": {
