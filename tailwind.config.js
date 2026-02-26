@@ -17,8 +17,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'Open Sans', 'sans-serif'],
-        heading: ['Montserrat', 'Poppins', 'sans-serif'],
+        sans: ['Poppins', 'sans-serif'],
+        heading: ['Poppins', 'sans-serif'],
       },
     },
   },
