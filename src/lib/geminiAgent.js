@@ -16,20 +16,43 @@ Seu papel é ajudar agricultores angolanos a encontrar e reservar equipamentos e
 
 Quando o utilizador fizer um pedido, NÃO faça perguntas de imediato. Siga esta ordem, rigorosamente:
 1. Extraia os parâmetros disponíveis na mensagem original (ex: localização, tipo de equipamento, data).
-2. Se houver o mínimo de informação (ex: apenas tipo de equipamento e localização, ou apenas tipo), use IMEDIATAMENTE a ferramenta \`search_equipment\` para procurar opções.
-3. SEMPRE que encontrar resultados (count > 0 no retorno de search_equipment), chame também a ferramenta \`navigate_to_results\` com os filtros usados.
-4. Responda ao utilizador informando o que foi encontrado de imediato.
-5. SÓ DEPOIS de dar uma resposta útil, pergunte por 1 ou 2 dados que faltam para refinar a pesquisa (ex: data ou quantidade), caso seja necessário.
-6. Sempre responda em Português de Angola, com linguagem simples, amigável e acionável.
-7. Mantenha o contexto de toda a conversa.
+2. Normalize o texto do utilizador antes de pesquisar: o utilizador pode usar ortografias variantes ou descrições em linguagem natural. Use as regras de mapeamento abaixo.
+3. Use IMEDIATAMENTE a ferramenta \`search_equipment\` com os melhores parâmetros possíveis.
+4. SEMPRE que encontrar resultados (count > 0), chame também \`navigate_to_results\`.
+5. Responda ao utilizador com o que foi encontrado de imediato.
+6. SÓ DEPOIS pergunte por 1 ou 2 dados em falta para refinar a pesquisa (ex: data ou quantidade), se necessário.
+7. Sempre responda em Português de Angola, com linguagem simples, amigável e acionável.
 
-Regra de Ouro: Nunca responda apenas com uma pergunta. Primeiro dê uma resposta/informação útil baseada no que o utilizador disse, e faça a pesquisa com o que tem.
+Regra de Ouro: Nunca responda apenas com uma pergunta. Sempre pesquise primeiro e apresente resultados.
+
+## Regras de Normalização e Mapeamento
+
+### Sinónimos e variantes ortográficas (normalize para pesquisa):
+- tractor, trátor, traktor, trator → equipment_type: "trator"
+- camião, caminhão, truck → equipment_type: "camião"
+- carrinha, canter, pick-up, pickup → equipment_type: "carrinha"
+- pulverizador, aplicador, pulverizadora → equipment_type: "pulverizador"
+- debulhadora, colheitadeira, ceifeira → equipment_type: "colheitadeira"
+- rega, irrigação, sistema de rega → equipment_type: "rega"
+
+### Mapeamento de intenção para categoria:
+- transporte de colheita, levar colheita, transportar produtos, escoamento → category: "Colheita"
+- preparar terreno, lavrar, arar, sulcar, gradagem → category: "Preparação do Solo"
+- semear, plantar, sementeira, plantio → category: "Plantio e Sementeira"
+- adubo, fertilizante, pesticida, pulverizar, fungicida → category: "Aplicação de Insumos"
+- colher, apanhar, ceifa, colheita, transporte colheita → category: "Colheita"
+
+### Estratégia de pesquisa:
+- Se o utilizador descreve uma ATIVIDADE (ex: "transporte de colheita") sem nomear equipamento específico, use apenas a \`category\` correspondente sem \`equipment_type\`. Isso devolve todos os equipamentos dessa categoria.
+- Se o utilizador nomeia um EQUIPAMENTO ESPECÍFICO com possível erro ortográfico, normalize o nome e pesquise com \`equipment_type\`.
+- Se a primeira pesquisa não devolver resultados, tente de novo apenas com \`category\` (sem equipment_type) para mostrar alternativas disponíveis na mesma área.
 
 Categorias de equipamentos disponíveis:
 - Preparação do Solo
 - Plantio e Sementeira
 - Aplicação de Insumos
 - Colheita`;
+
 
 const tools = [
   {
@@ -168,20 +191,30 @@ async function executeToolCall(toolCall) {
   try {
     switch (name) {
       case "search_equipment": {
-        let query = supabase.from('listings').select('*, profiles(nome_completo)');
+        const runQuery = async (equipmentType) => {
+          let q = supabase.from('listings').select('*, profiles(nome_completo)');
+          if (args.location) q = q.ilike('localizacao', `%${args.location}%`);
+          if (args.category) q = q.eq('categoria', args.category);
+          if (equipmentType) {
+            q = q.or(`titulo.ilike.%${equipmentType}%,capacidade_especificacao.ilike.%${equipmentType}%,descricao.ilike.%${equipmentType}%`);
+          }
+          if (args.max_price_per_day) q = q.lte('preco', args.max_price_per_day);
+          return q.limit(5);
+        };
 
-        if (args.location) query = query.ilike('localizacao', `%${args.location}%`);
-        if (args.category) query = query.eq('categoria', args.category);
-        if (args.equipment_type) {
-          query = query.or(`titulo.ilike.%${args.equipment_type}%,capacidade_especificacao.ilike.%${args.equipment_type}%`);
-        }
-        if (args.max_price_per_day) query = query.lte('preco', args.max_price_per_day);
-
-        const { data, error } = await query.limit(5);
+        // Primary search with equipment_type
+        let { data, error } = await runQuery(args.equipment_type);
         if (error) throw error;
 
+        // Fallback: if no results and we had an equipment_type, try category only
+        if ((!data || data.length === 0) && args.equipment_type && args.category) {
+          const fallback = await runQuery(null);
+          if (!fallback.error && fallback.data && fallback.data.length > 0) {
+            data = fallback.data;
+          }
+        }
+
         const items = data || [];
-        // Return object instead of array to satisfy Gemini API protobuf requirements
         return {
           items: items,
           count: items.length,
@@ -190,7 +223,6 @@ async function executeToolCall(toolCall) {
       }
 
       case "check_availability": {
-        // Query to check if there are overlaps in the reservas table
         const { data, error } = await supabase
           .from('reservas')
           .select('*')
@@ -199,7 +231,6 @@ async function executeToolCall(toolCall) {
           .in('status', ['pendente', 'confirmada']);
 
         if (error) throw error;
-
         return { available: data.length === 0, conflicting_bookings: data.length };
       }
 
@@ -215,7 +246,6 @@ async function executeToolCall(toolCall) {
       }
 
       case "create_booking_proposal": {
-        // Not actually saving, just formatting for UI
         return {
           proposalReady: true,
           bookingData: args
@@ -234,6 +264,7 @@ async function executeToolCall(toolCall) {
     return { error: error.message };
   }
 }
+
 
 export async function runAgent(userMessage, conversationHistory = []) {
   if (!aiClient) {
