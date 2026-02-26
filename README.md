@@ -42,6 +42,7 @@ Crie um arquivo `.env` na raiz do projeto para fazer a conexão com seu banco Su
 ```env
 VITE_SUPABASE_URL="https://seu-id-do-projeto.supabase.co"
 VITE_SUPABASE_ANON_KEY="sua_chave_anonima_publica"
+VITE_GEMINI_API_KEY="sua_chave_api_gemini"
 ```
 
 ### 5. Configurando o Banco de Dados (Supabase)

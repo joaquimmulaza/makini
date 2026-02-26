@@ -1,8 +1,13 @@
 import { Outlet } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { Header, Footer } from './components/layout.jsx'
+import { useMakiniAgent } from './hooks/useMakiniAgent'
+import AgentButton from './components/agent/AgentButton'
+import AgentModal from './components/agent/AgentModal'
 
 function App() {
+    const agentState = useMakiniAgent();
+
     return (
         <div className="flex min-h-screen flex-col bg-makini-sand">
             <Toaster
@@ -24,6 +29,13 @@ function App() {
                 <Outlet />
             </main>
             <Footer />
+
+            {/* Makini Agent Components */}
+            <AgentButton
+                onClick={() => agentState.openAgent()}
+                hasNotification={!agentState.isOpen && agentState.messages.length <= 1}
+            />
+            <AgentModal {...agentState} />
         </div>
     )
 }
