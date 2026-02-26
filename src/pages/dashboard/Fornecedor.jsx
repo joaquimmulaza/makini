@@ -13,7 +13,7 @@ import { CATEGORIAS_NOMES } from '../../lib/categorias';
 
 
 export default function DashboardFornecedor() {
-    const [activeTab, setActiveTab] = useState('reservas'); // 'reservas' | 'anuncios'
+    const [activeTab, setActiveTab] = useState('reservas'); // 'reservas' | 'ads'
     const [reservas, setReservas] = useState([]);
     const [myListings, setMyListings] = useState([]);
     const [loading, setLoading] = useState(true);
