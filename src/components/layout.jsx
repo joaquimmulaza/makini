@@ -17,6 +17,18 @@ export function Header() {
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+    const handleScrollLinkClick = (e, id, isMobile = false) => {
+        if (isMobile) closeMobileMenu();
+        if (window.location.pathname === '/') {
+            e.preventDefault();
+            const element = document.getElementById(id);
+            if (element) {
+                const y = element.getBoundingClientRect().top + window.scrollY - 80;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }
+    };
+
     return (
         <header className="sticky top-0 z-50 w-full border-b border-makini-clay/20 bg-makini-earth text-white shadow-sm">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -25,15 +37,16 @@ export function Header() {
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-                    <Link to="/buscar" className="transition-colors hover:text-makini-lightGreen">Mercado</Link>
-                    <Link to={`/buscar?categoria=${encodeURIComponent('Preparação do Solo')}`} className="transition-colors hover:text-makini-lightGreen">Preparação do Solo</Link>
-                    <Link to={`/buscar?categoria=${encodeURIComponent('Colheita')}`} className="transition-colors hover:text-makini-lightGreen">Colheita</Link>
+                   
                 </nav>
 
                 <div className="flex items-center gap-4">
                     <div className="hidden md:flex items-center gap-2">
                         {user ? (
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-8">
+                                 <Link to="/buscar" className="transition-colors hover:text-makini-lightGreen">Mercado</Link>
+                    <Link to="/#categorias" onClick={(e) => handleScrollLinkClick(e, 'categorias')} className="transition-colors hover:text-makini-lightGreen">Categorias</Link>
+                    <Link to="/#como-funciona" onClick={(e) => handleScrollLinkClick(e, 'como-funciona')} className="transition-colors hover:text-makini-lightGreen">Como Funciona</Link>
                                 <span className="text-sm font-medium text-makini-sand hidden lg:block">
                                     Olá, {profile?.nome_completo || user.email}
                                 </span>
@@ -73,8 +86,8 @@ export function Header() {
                 <div className="md:hidden border-t border-makini-clay/20 bg-makini-earth px-4 py-4 space-y-4 shadow-lg absolute w-full left-0">
                     <nav className="flex flex-col gap-4 text-sm font-medium">
                         <Link to="/buscar" className="transition-colors hover:text-makini-lightGreen" onClick={closeMobileMenu}>Mercado</Link>
-                        <Link to={`/buscar?categoria=${encodeURIComponent('Preparação do Solo')}`} className="transition-colors hover:text-makini-lightGreen" onClick={closeMobileMenu}>Preparação do Solo</Link>
-                        <Link to={`/buscar?categoria=${encodeURIComponent('Colheita')}`} className="transition-colors hover:text-makini-lightGreen" onClick={closeMobileMenu}>Colheita</Link>
+                        <Link to="/#categorias" onClick={(e) => handleScrollLinkClick(e, 'categorias', true)} className="transition-colors hover:text-makini-lightGreen">Categorias</Link>
+                        <Link to="/#como-funciona" onClick={(e) => handleScrollLinkClick(e, 'como-funciona', true)} className="transition-colors hover:text-makini-lightGreen">Como Funciona</Link>
                     </nav>
 
                     <div className="flex flex-col gap-2 pt-4 border-t border-makini-clay/20">

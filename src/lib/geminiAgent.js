@@ -10,9 +10,9 @@ if (apiKey) {
 }
 
 // Default model as requested
-const MODEL_NAME = "gemini-3-flash-preview"; // gemini-3-flash-preview ? actually there's gemini-2.0-flash, but prompt says "gemini-3-flash-preview". Let's use it or 3.0. We will use exactly "gemini-3-flash-preview" as requested by user. Wait, usually the current version is gemini-2.5-flash or gemini-2.0-flash. The prompt said gemini-3-flash-preview. I'll use it to respect the explicit request.
+const MODEL_NAME = "gemini-2.5-flash-lite"; // gemini-3-flash-preview ? actually there's gemini-2.0-flash, but prompt says "gemini-3-flash-preview". Let's use it or 3.0. We will use exactly "gemini-3-flash-preview" as requested by user. Wait, usually the current version is gemini-2.5-flash or gemini-2.0-flash. The prompt said gemini-3-flash-preview. I'll use it to respect the explicit request.
 // Wait, user explicitly specified: gemini-3-flash-preview. I'll use the value from prompt.
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-2.5-flash-lite";
 
 const systemPrompt = `Você é o Makini Agent, um assistente de gestão logística agrícola especializado em Angola.
 Seu papel é ajudar agricultores angolanos a encontrar e reservar equipamentos e serviços agrícolas.

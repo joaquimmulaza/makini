@@ -351,7 +351,14 @@ export default function DashboardFornecedor() {
                                                 </div>
                                                 <div className="text-sm text-makini-clay">
                                                     <p><strong className="text-makini-black">Solicitado por:</strong> {reserva.profiles?.nome_completo || 'Utilizador'}</p>
-                                                    <p className="flex items-center gap-1 mt-1"><Calendar className="w-4 h-4" /> <strong>Datas Solicitadas:</strong> {reserva.dias_solicitados}</p>
+                                                    {reserva.dias_solicitados?.includes(' até ') ? (
+                                                        <div className="flex flex-col gap-1 mt-1">
+                                                            <p className="flex items-center gap-1"><Calendar className="w-4 h-4" /> <strong>Data de Início:</strong> {reserva.dias_solicitados.split(' até ')[0]}</p>
+                                                            <p className="flex items-center gap-1"><Calendar className="w-4 h-4" /> <strong>Data de Fim:</strong> {reserva.dias_solicitados.split(' até ')[1]}</p>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="flex items-center gap-1 mt-1"><Calendar className="w-4 h-4" /> <strong>Datas Solicitadas:</strong> {reserva.dias_solicitados}</p>
+                                                    )}
                                                     <p className="text-xs text-makini-clay/70 mt-1">Submetido a {format(new Date(reserva.created_at), "dd 'de' MMMM, HH:mm", { locale: pt })}</p>
                                                 </div>
                                                 <div className="bg-makini-sand p-3 rounded-md border border-makini-clay/10 mt-2">

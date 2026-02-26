@@ -21,7 +21,8 @@ export default function SearchListings() {
     const [loading, setLoading] = useState(true);
 
     const [selectedListing, setSelectedListing] = useState(null);
-    const [reservationDates, setReservationDates] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [reservationContext, setReservationContext] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -78,7 +79,7 @@ export default function SearchListings() {
                         agricultor_id: user.id,
                         fornecedor_id: selectedListing.fornecedor_id,
                         anuncio_id: selectedListing.id,
-                        dias_solicitados: reservationDates,
+                        dias_solicitados: `${startDate.split('-').reverse().join('/')} até ${endDate.split('-').reverse().join('/')}`,
                         contexto: reservationContext,
                         status: 'pendente'
                     }
@@ -88,7 +89,8 @@ export default function SearchListings() {
 
             toast.success(`Reserva solicitada para "${selectedListing?.titulo}"! Aguarde a confirmação do fornecedor.`);
             setSelectedListing(null);
-            setReservationDates('');
+            setStartDate('');
+            setEndDate('');
             setReservationContext('');
         } catch (err) {
             console.error("Reservation Error:", err);
@@ -122,14 +124,14 @@ export default function SearchListings() {
                         </div>
                     </div>
 
-                    <Button
+                    {/* <Button
                         onClick={simulateGeminiRecommendation}
                         disabled={isSearchingContext}
                         className="bg-makini-earth hover:bg-makini-clay text-white max-w-xs whitespace-normal h-auto py-3 px-4 flex items-center gap-2"
                     >
                         <Sparkles className="w-5 h-5 text-makini-lightGreen" />
                         {isSearchingContext ? 'Mapeando contexto...' : 'Recomendação Inteligente'}
-                    </Button>
+                    </Button> */}
                 </div>
 
                 {loading ? (
@@ -211,18 +213,35 @@ export default function SearchListings() {
                                                                             <span className="text-sm text-makini-clay flex items-center gap-1"><MapPin className="w-3 h-3" /> {eq.localizacao}</span>
                                                                             <span className="text-sm text-makini-green font-semibold">{Number(eq.preco).toLocaleString()} kz</span>
                                                                         </div>
-                                                                        <div className="grid gap-2">
-                                                                            <label htmlFor="dates" className="text-sm font-medium text-makini-earth">
-                                                                                Período de Uso (Ex: 10 a 12 de Maio)
-                                                                            </label>
-                                                                            <input
-                                                                                id="dates"
-                                                                                required
-                                                                                value={reservationDates}
-                                                                                onChange={(e) => setReservationDates(e.target.value)}
-                                                                                className="w-full p-2 border border-makini-clay/30 rounded-md focus:outline-none focus:border-makini-green"
-                                                                                placeholder="Insira as datas desejadas..."
-                                                                            />
+                                                                        <div className="grid grid-cols-2 gap-4">
+                                                                            <div className="grid gap-2">
+                                                                                <label htmlFor="startDate" className="text-sm font-medium text-makini-earth">
+                                                                                    Data de Início
+                                                                                </label>
+                                                                                <input
+                                                                                    id="startDate"
+                                                                                    type="date"
+                                                                                    required
+                                                                                    min={new Date().toISOString().split('T')[0]}
+                                                                                    value={startDate}
+                                                                                    onChange={(e) => setStartDate(e.target.value)}
+                                                                                    className="w-full p-2 border border-makini-clay/30 rounded-md focus:outline-none focus:border-makini-green"
+                                                                                />
+                                                                            </div>
+                                                                            <div className="grid gap-2">
+                                                                                <label htmlFor="endDate" className="text-sm font-medium text-makini-earth">
+                                                                                    Data de Fim
+                                                                                </label>
+                                                                                <input
+                                                                                    id="endDate"
+                                                                                    type="date"
+                                                                                    required
+                                                                                    min={startDate || new Date().toISOString().split('T')[0]}
+                                                                                    value={endDate}
+                                                                                    onChange={(e) => setEndDate(e.target.value)}
+                                                                                    className="w-full p-2 border border-makini-clay/30 rounded-md focus:outline-none focus:border-makini-green"
+                                                                                />
+                                                                            </div>
                                                                         </div>
                                                                         <div className="grid gap-2">
                                                                             <label htmlFor="context" className="text-sm font-medium text-makini-earth">

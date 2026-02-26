@@ -130,7 +130,7 @@ export default function Register() {
             if (authError) throw authError;
 
             if (authData?.user) {
-                toast.success('Registo concluído! Verifique o seu email e faça login.');
+                toast.success('Registo concluído!');
                 navigate('/login');
             }
         } catch (err) {

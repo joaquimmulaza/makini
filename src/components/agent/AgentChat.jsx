@@ -40,10 +40,10 @@ export default function AgentChat({ messages, isLoading, onSuggestionClick }) {
                 <div className="flex flex-col gap-2 mt-4 ml-11 min-w-0 max-w-[80%] animate-fade-in-up" style={{ animationDelay: '300ms' }}>
                     <p className="text-xs text-gray-500 font-medium mb-1">Exemplos do que pode pedir:</p>
                     <button
-                        onClick={() => onSuggestionClick("Preciso de um tractor em Huambo amanhã")}
+                        onClick={() => onSuggestionClick("Preciso de um tractor em Luanda amanhã")}
                         className="text-left text-sm bg-white border border-emerald-100 hover:border-[#1B4332] hover:bg-emerald-50 text-[#1B4332] px-3 py-2 rounded-lg transition-colors"
                     >
-                        "Preciso de um tractor em Huambo amanhã"
+                        "Preciso de um tractor em Luanda amanhã"
                     </button>
                     <button
                         onClick={() => onSuggestionClick("Quero transporte de colheita para esta semana")}

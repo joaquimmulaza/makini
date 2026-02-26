@@ -1,6 +1,6 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button.jsx';
 import { Card, CardContent } from '../components/ui/card.jsx';
@@ -18,6 +18,20 @@ import heroSupplier from '../assets/hero_supplier.png';
 
 export default function Home() {
     const [counts, setCounts] = useState({});
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.hash) {
+            const id = location.hash.replace('#', '');
+            const element = document.getElementById(id);
+            if (element) {
+                setTimeout(() => {
+                    const y = element.getBoundingClientRect().top + window.scrollY - 80;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }, 100);
+            }
+        }
+    }, [location]);
 
     useEffect(() => {
         // Buscar contagem real de anúncios por categoria
@@ -41,7 +55,7 @@ export default function Home() {
                 <Swiper
                     modules={[Autoplay, Pagination, EffectFade]}
                     effect="fade"
-                    autoplay={{ delay: 6000, disableOnInteraction: false }}
+                    autoplay={{ delay: 2000, disableOnInteraction: false }}
                     pagination={{ clickable: true }}
                     loop
                     className="h-full w-full"
@@ -49,22 +63,22 @@ export default function Home() {
                     {/* Farmer Slide */}
                     <SwiperSlide>
                         <div className="relative h-full w-full">
-                            <div className="absolute inset-0 bg-black/40 z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
                             <img
                                 src={heroFarmer}
                                 alt="Agricultor Angolano"
                                 className="absolute inset-0 h-full w-full object-cover"
                             />
-                            <div className="absolute inset-0 z-20 flex flex-col justify-center items-center text-center px-4">
-                                <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6 max-w-4xl drop-shadow-lg">
-                                    Encontre o equipamento certo para a sua terra.
-                                </h1>
-                                <p className="text-xl text-makini-sand mb-8 max-w-2xl drop-shadow">
-                                    Localize, agende e contrate recursos agrícolas de forma simples e eficiente em toda Angola.
-                                </p>
-                                <div className="flex gap-4">
-                                    <Button size="lg" className="bg-makini-green hover:bg-makini-green/90 text-white font-semibold text-lg" asChild>
-                                        <Link to="/buscar">Procurar Equipamentos</Link>
+                            <div className="absolute inset-0 z-20 flex items-center px-4 md:px-12 lg:px-24">
+                                <div className="container mx-auto flex flex-col items-start text-left">
+                                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-makini-sand mb-6 max-w-2xl drop-shadow-lg leading-tight">
+                                        O equipamento certo<br className="hidden md:block" /> para a sua terra está<br className="hidden md:block" /> aqui.
+                                    </h1>
+                                    <p className="text-base md:text-lg text-white mb-8 max-w-xl drop-shadow font-medium">
+                                        Tudo que sua lavoura precisa fácil de encontrar, fácil de contratar
+                                    </p>
+                                    <Button size="lg" className="bg-makini-green hover:bg-makini-green/90 text-white font-bold text-lg rounded-full px-8 h-14" asChild>
+                                        <Link to="/buscar">Começar</Link>
                                     </Button>
                                 </div>
                             </div>
@@ -74,21 +88,21 @@ export default function Home() {
                     {/* Supplier Slide */}
                     <SwiperSlide>
                         <div className="relative h-full w-full">
-                            <div className="absolute inset-0 bg-black/40 z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
                             <img
                                 src={heroSupplier}
                                 alt="Fornecedor Agrícola"
                                 className="absolute inset-0 h-full w-full object-cover"
                             />
-                            <div className="absolute inset-0 z-20 flex flex-col justify-center items-center text-center px-4">
-                                <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6 max-w-4xl drop-shadow-lg">
-                                    Rentabilize o seu equipamento quando não o usa.
-                                </h1>
-                                <p className="text-xl text-makini-sand mb-8 max-w-2xl drop-shadow">
-                                    Conecte-se com agricultores que precisam dos seus tratores, camiões ou serviços agrícolas.
-                                </p>
-                                <div className="flex gap-4">
-                                    <Button size="lg" className="bg-makini-earth border border-makini-sand hover:bg-makini-clay text-white font-semibold text-lg" asChild>
+                            <div className="absolute inset-0 z-20 flex items-center px-4 md:px-12 lg:px-24">
+                                <div className="container mx-auto flex flex-col items-start text-left">
+                                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-makini-sand mb-6 max-w-2xl drop-shadow-lg leading-tight">
+                                        Rentabilize o seu equipamento<br className="hidden md:block" /> quando não o usa.
+                                    </h1>
+                                    <p className="text-base md:text-lg text-white mb-8 max-w-xl drop-shadow font-medium">
+                                        Conecte-se com agricultores que precisam dos seus tratores, camiões ou serviços agrícolas.
+                                    </p>
+                                    <Button size="lg" className="bg-makini-green hover:bg-makini-green/90 text-white font-bold text-lg rounded-full px-8 h-14" asChild>
                                         <Link to="/register">Anunciar Agora</Link>
                                     </Button>
                                 </div>
@@ -99,7 +113,7 @@ export default function Home() {
             </section>
 
             {/* Categories Section */}
-            <section className="py-20 bg-makini-sand">
+            <section id="categorias" className="py-20 bg-makini-sand">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-heading font-bold text-makini-earth mb-4">Explore por Categoria</h2>
@@ -131,7 +145,7 @@ export default function Home() {
             </section>
 
             {/* Como Funciona */}
-            <section className="py-20 bg-white">
+            <section id="como-funciona" className="py-20 bg-white">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-heading font-bold text-makini-earth mb-4">Como Funciona</h2>
