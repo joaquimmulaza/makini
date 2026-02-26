@@ -36,48 +36,49 @@ export function Header() {
                     <img src="/Union.png" alt="Makini Logo" className="h-8 w-auto" />
                 </Link>
 
-                <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-                   
-                </nav>
+                <div className="flex items-center gap-8">
+                    <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+                        <Link to="/buscar" className="transition-colors hover:text-makini-lightGreen">Mercado</Link>
+                        <Link to="/#categorias" onClick={(e) => handleScrollLinkClick(e, 'categorias')} className="transition-colors hover:text-makini-lightGreen">Categorias</Link>
+                        <Link to="/#como-funciona" onClick={(e) => handleScrollLinkClick(e, 'como-funciona')} className="transition-colors hover:text-makini-lightGreen">Como Funciona</Link>
+                    </nav>
 
-                <div className="flex items-center gap-4">
-                    <div className="hidden md:flex items-center gap-2">
-                        {user ? (
-                            <div className="flex items-center gap-8">
-                                 <Link to="/buscar" className="transition-colors hover:text-makini-lightGreen">Mercado</Link>
-                    <Link to="/#categorias" onClick={(e) => handleScrollLinkClick(e, 'categorias')} className="transition-colors hover:text-makini-lightGreen">Categorias</Link>
-                    <Link to="/#como-funciona" onClick={(e) => handleScrollLinkClick(e, 'como-funciona')} className="transition-colors hover:text-makini-lightGreen">Como Funciona</Link>
-                                <span className="text-sm font-medium text-makini-sand hidden lg:block">
-                                    Olá, {profile?.nome_completo || user.email}
-                                </span>
-                                {profile?.role === 'fornecedor' && (
-                                    <Button variant="ghost" asChild className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
-                                        <Link to="/dashboard" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Painel</Link>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden md:flex items-center gap-2">
+                            {user ? (
+                                <div className="flex items-center gap-8">
+                                    <span className="text-sm font-medium text-makini-sand hidden lg:block">
+                                        Olá, {profile?.nome_completo || user.email}
+                                    </span>
+                                    {profile?.role === 'fornecedor' && (
+                                        <Button variant="ghost" asChild className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+                                            <Link to="/dashboard" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Painel</Link>
+                                        </Button>
+                                    )}
+                                    {profile?.role === 'agricultor' && (
+                                        <Button variant="ghost" asChild className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+                                            <Link to="/minhas-reservas" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Minhas Reservas</Link>
+                                        </Button>
+                                    )}
+                                    <Button variant="ghost" onClick={handleLogout} className="text-red-300 hover:bg-red-900/50 hover:text-red-100 flex items-center gap-2">
+                                        <LogOut className="w-4 h-4" /> Sair
                                     </Button>
-                                )}
-                                {profile?.role === 'agricultor' && (
-                                    <Button variant="ghost" asChild className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
-                                        <Link to="/minhas-reservas" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Minhas Reservas</Link>
+                                </div>
+                            ) : (
+                                <>
+                                    <Button variant="ghost" asChild className="text-white hover:bg-makini-clay hover:text-white">
+                                        <Link to="/login">Entrar</Link>
                                     </Button>
-                                )}
-                                <Button variant="ghost" onClick={handleLogout} className="text-red-300 hover:bg-red-900/50 hover:text-red-100 flex items-center gap-2">
-                                    <LogOut className="w-4 h-4" /> Sair
-                                </Button>
-                            </div>
-                        ) : (
-                            <>
-                                <Button variant="ghost" asChild className="text-white hover:bg-makini-clay hover:text-white">
-                                    <Link to="/login">Entrar</Link>
-                                </Button>
-                                <Button variant="default" asChild>
-                                    <Link to="/register">Registar</Link>
-                                </Button>
-                            </>
-                        )}
+                                    <Button variant="default" asChild>
+                                        <Link to="/register">Registar</Link>
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                        <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-makini-clay" onClick={toggleMobileMenu}>
+                            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                        </Button>
                     </div>
-                    <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-makini-clay" onClick={toggleMobileMenu}>
-                        {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                    </Button>
                 </div>
             </div>
 
