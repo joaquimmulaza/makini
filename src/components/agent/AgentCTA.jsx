@@ -33,7 +33,7 @@ export default function AgentCTA({ cta, onClose }) {
                     </div>
                     <div className="p-4 flex flex-col gap-2">
                         <button
-                            onClick={() => handleNavigate(fullPath)}
+                            onClick={() => handleNavigate(params.toString() ? `${path}?${params.toString()}` : path)}
                             className="w-full bg-[#1B4332] text-white py-2.5 rounded-lg active:scale-[0.98] transition-transform font-medium"
                         >
                             Ver Opções Disponíveis →

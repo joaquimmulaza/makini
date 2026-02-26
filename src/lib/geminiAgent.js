@@ -9,24 +9,21 @@ if (apiKey) {
   aiClient = new GoogleGenAI({ apiKey });
 }
 
-// Default model as requested
-const MODEL_NAME = "gemini-2.5-flash-lite"; // gemini-3-flash-preview ? actually there's gemini-2.0-flash, but prompt says "gemini-3-flash-preview". Let's use it or 3.0. We will use exactly "gemini-3-flash-preview" as requested by user. Wait, usually the current version is gemini-2.5-flash or gemini-2.0-flash. The prompt said gemini-3-flash-preview. I'll use it to respect the explicit request.
-// Wait, user explicitly specified: gemini-3-flash-preview. I'll use the value from prompt.
-const MODEL = "gemini-2.5-flash-lite";
+const MODEL = "gemini-2.5-flash";
 
 const systemPrompt = `Você é o Makini Agent, um assistente de gestão logística agrícola especializado em Angola.
 Seu papel é ajudar agricultores angolanos a encontrar e reservar equipamentos e serviços agrícolas.
 
-Quando o utilizador fizer um pedido:
-1. Extraia os parâmetros: localização, tipo de equipamento, data/urgência, quantidade, requisitos especiais
-2. Use search_equipment para pesquisar na base de dados
-3. SEMPRE que encontrar resultados (count > 0 no retorno de search_equipment), chame também a ferramenta navigate_to_results com os filtros usados
-4. SEMPRE que não encontrar resultados (count === 0), informe e sugira alternativas
-5. Apresente as opções de forma clara e acionável
-6. Sempre responda em Português de Angola, com linguagem simples e acessível
-7. Mantenha o contexto de toda a conversa — se o utilizador disser "desse" ou "daquele", refira-se ao equipamento mencionado anteriormente
+Quando o utilizador fizer um pedido, NÃO faça perguntas de imediato. Siga esta ordem, rigorosamente:
+1. Extraia os parâmetros disponíveis na mensagem original (ex: localização, tipo de equipamento, data).
+2. Se houver o mínimo de informação (ex: apenas tipo de equipamento e localização, ou apenas tipo), use IMEDIATAMENTE a ferramenta \`search_equipment\` para procurar opções.
+3. SEMPRE que encontrar resultados (count > 0 no retorno de search_equipment), chame também a ferramenta \`navigate_to_results\` com os filtros usados.
+4. Responda ao utilizador informando o que foi encontrado de imediato.
+5. SÓ DEPOIS de dar uma resposta útil, pergunte por 1 ou 2 dados que faltam para refinar a pesquisa (ex: data ou quantidade), caso seja necessário.
+6. Sempre responda em Português de Angola, com linguagem simples, amigável e acionável.
+7. Mantenha o contexto de toda a conversa.
 
-Regra importante: Após search_equipment com resultados, SEMPRE chame navigate_to_results para gerar o botão de navegação.
+Regra de Ouro: Nunca responda apenas com uma pergunta. Primeiro dê uma resposta/informação útil baseada no que o utilizador disse, e faça a pesquisa com o que tem.
 
 Categorias de equipamentos disponíveis:
 - Preparação do Solo
@@ -263,14 +260,19 @@ export async function runAgent(userMessage, conversationHistory = []) {
       model: MODEL,
       config: {
         systemInstruction: systemPrompt,
-        tools: tools.map(tool => ({ functionDeclarations: [tool] })),
+        tools: [{ functionDeclarations: tools }],
         temperature: 1.0,
       },
       history: formattedHistory.slice(0, -1),
     });
 
-    // Send the message
-    let response = await chatSession.sendMessage({ message: userMessage });
+    // Send the message with a 30 second timeout to prevent infinite loading
+    const sendWithTimeout = (fn) => Promise.race([
+      fn(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
+    ]);
+
+    let response = await sendWithTimeout(() => chatSession.sendMessage({ message: userMessage }));
 
     let actionType = "NONE";
     let actionData = null;
@@ -299,7 +301,7 @@ export async function runAgent(userMessage, conversationHistory = []) {
       }
 
       // Return tool response to the model
-      response = await chatSession.sendMessage({
+      response = await sendWithTimeout(() => chatSession.sendMessage({
         message: [{
           functionResponse: {
             name: functionCall.name,
@@ -308,7 +310,7 @@ export async function runAgent(userMessage, conversationHistory = []) {
             }
           }
         }]
-      });
+      }));
 
       // Check if there are more tools to call
       hasToolCalls = response.functionCalls && response.functionCalls.length > 0;
@@ -322,9 +324,17 @@ export async function runAgent(userMessage, conversationHistory = []) {
   } catch (error) {
     console.error("Gemini API Error:", error);
 
-    // Detectar tipo de erro pelo código HTTP
+    // Timeout error
     const errorMessage = error?.message || '';
     const errorCode = error?.status || '';
+
+    if (errorMessage === 'timeout') {
+      return {
+        message: "⏳ O assistente demorou muito a responder. Por favor, tente novamente.",
+        actionType: "ERROR",
+        actionData: {}
+      };
+    }
 
     // 429 - Quota excedida
     if (errorMessage.includes('429') || errorCode === 'RESOURCE_EXHAUSTED') {
