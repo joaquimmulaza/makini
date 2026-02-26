@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { runAgent } from '../lib/geminiAgent';
 
 export function useMakiniAgent() {
@@ -7,6 +7,7 @@ export function useMakiniAgent() {
     const [isLoading, setIsLoading] = useState(false);
     const [currentCTA, setCurrentCTA] = useState(null);
     const [conversationHistory, setConversationHistory] = useState([]);
+    const lastCallTime = useRef(0);
 
     const openAgent = useCallback((initialQuery = null) => {
         setIsOpen(true);
@@ -48,6 +49,10 @@ export function useMakiniAgent() {
 
     const sendMessage = useCallback(async (text) => {
         if (!text.trim()) return;
+
+        const now = Date.now();
+        if (now - lastCallTime.current < 2000) return; // ignora cliques duplos / rate limit
+        lastCallTime.current = now;
 
         // Remove current CTA when a new message is sent
         setCurrentCTA(null);

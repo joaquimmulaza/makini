@@ -12,17 +12,21 @@ if (apiKey) {
 // Default model as requested
 const MODEL_NAME = "gemini-3-flash-preview"; // gemini-3-flash-preview ? actually there's gemini-2.0-flash, but prompt says "gemini-3-flash-preview". Let's use it or 3.0. We will use exactly "gemini-3-flash-preview" as requested by user. Wait, usually the current version is gemini-2.5-flash or gemini-2.0-flash. The prompt said gemini-3-flash-preview. I'll use it to respect the explicit request.
 // Wait, user explicitly specified: gemini-3-flash-preview. I'll use the value from prompt.
-const MODEL = "gemini-3-flash-preview";
+const MODEL = "gemini-2.5-flash";
 
 const systemPrompt = `Você é o Makini Agent, um assistente de gestão logística agrícola especializado em Angola.
 Seu papel é ajudar agricultores angolanos a encontrar e reservar equipamentos e serviços agrícolas.
 
 Quando o utilizador fizer um pedido:
 1. Extraia os parâmetros: localização, tipo de equipamento, data/urgência, quantidade, requisitos especiais
-2. Use as ferramentas disponíveis para pesquisar na base de dados
-3. Apresente as melhores opções de forma clara e acionável
-4. Sempre responda em Português, com linguagem simples e acessível
-5. Se não houver opções exatas, sugira alternativas próximas (outra localização, data diferente, etc.)
+2. Use search_equipment para pesquisar na base de dados
+3. SEMPRE que encontrar resultados (count > 0 no retorno de search_equipment), chame também a ferramenta navigate_to_results com os filtros usados
+4. SEMPRE que não encontrar resultados (count === 0), informe e sugira alternativas
+5. Apresente as opções de forma clara e acionável
+6. Sempre responda em Português de Angola, com linguagem simples e acessível
+7. Mantenha o contexto de toda a conversa — se o utilizador disser "desse" ou "daquele", refira-se ao equipamento mencionado anteriormente
+
+Regra importante: Após search_equipment com resultados, SEMPRE chame navigate_to_results para gerar o botão de navegação.
 
 Categorias de equipamentos disponíveis:
 - Preparação do Solo
@@ -179,8 +183,13 @@ async function executeToolCall(toolCall) {
         const { data, error } = await query.limit(5);
         if (error) throw error;
 
-        // Return max 5 items to keep context small
-        return data || [];
+        const items = data || [];
+        // Return object instead of array to satisfy Gemini API protobuf requirements
+        return {
+          items: items,
+          count: items.length,
+          found: items.length > 0
+        };
       }
 
       case "check_availability": {
@@ -256,7 +265,8 @@ export async function runAgent(userMessage, conversationHistory = []) {
         systemInstruction: systemPrompt,
         tools: tools.map(tool => ({ functionDeclarations: [tool] })),
         temperature: 1.0,
-      }
+      },
+      history: formattedHistory.slice(0, -1),
     });
 
     // Send the message
@@ -284,7 +294,7 @@ export async function runAgent(userMessage, conversationHistory = []) {
       } else if (functionCall.name === "create_booking_proposal") {
         actionType = "BOOKING_PROPOSAL";
         actionData = toolResult;
-      } else if (functionCall.name === "search_equipment" && toolResult.length === 0) {
+      } else if (functionCall.name === "search_equipment" && toolResult.count === 0) {
         actionType = "NO_RESULTS";
       }
 
@@ -293,7 +303,9 @@ export async function runAgent(userMessage, conversationHistory = []) {
         message: [{
           functionResponse: {
             name: functionCall.name,
-            response: toolResult
+            response: {
+              result: Array.isArray(toolResult) ? { items: toolResult } : toolResult
+            }
           }
         }]
       });
@@ -309,8 +321,37 @@ export async function runAgent(userMessage, conversationHistory = []) {
     };
   } catch (error) {
     console.error("Gemini API Error:", error);
+
+    // Detectar tipo de erro pelo código HTTP
+    const errorMessage = error?.message || '';
+    const errorCode = error?.status || '';
+
+    // 429 - Quota excedida
+    if (errorMessage.includes('429') || errorCode === 'RESOURCE_EXHAUSTED') {
+      // Tentar extrair o tempo de espera do erro
+      const retryMatch = errorMessage.match(/retry in (\d+)/i);
+      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) : 60;
+      const waitMinutes = Math.ceil(waitSeconds / 60);
+
+      return {
+        message: `⏳ O assistente está temporariamente ocupado (muitos pedidos). Por favor, aguarde ${waitMinutes} minuto${waitMinutes > 1 ? 's' : ''} e tente novamente.\n\nEnquanto isso, pode pesquisar directamente na plataforma.`,
+        actionType: "RATE_LIMITED",
+        actionData: { waitSeconds, waitMinutes }
+      };
+    }
+
+    // 401 / 403 - Chave API inválida
+    if (errorMessage.includes('401') || errorMessage.includes('403') || errorCode === 'PERMISSION_DENIED') {
+      return {
+        message: "🔑 Erro de configuração do assistente. Por favor, contacte o suporte Makini.",
+        actionType: "ERROR",
+        actionData: {}
+      };
+    }
+
+    // 500 / Erro de rede genérico
     return {
-      message: "Estou com dificuldades de ligação. Pode tentar pesquisar diretamente na plataforma.",
+      message: "🌐 Estou com dificuldades de ligação. Pode tentar pesquisar directamente na plataforma enquanto resolvo o problema.",
       actionType: "ERROR",
       actionData: {}
     };

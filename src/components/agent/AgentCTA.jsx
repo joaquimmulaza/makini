@@ -88,6 +88,25 @@ export default function AgentCTA({ cta, onClose }) {
             );
         }
 
+        case 'RATE_LIMITED': {
+            return (
+                <div className="mx-4 mb-4 bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden animate-fade-in-up">
+                    <div className="bg-blue-50 px-4 py-3 border-b border-blue-100 flex items-center">
+                        <span className="text-xl mr-2">⏳</span>
+                        <span className="font-semibold text-blue-800">Assistente temporariamente ocupado</span>
+                    </div>
+                    <div className="px-4 pb-4 pt-3 flex flex-col gap-2">
+                        <button
+                            onClick={() => handleNavigate('/buscar')}
+                            className="w-full bg-[#1B4332] text-white py-2.5 rounded-lg active:scale-[0.98] transition-transform font-medium"
+                        >
+                            Pesquisar directamente →
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
         default:
             return null;
     }
