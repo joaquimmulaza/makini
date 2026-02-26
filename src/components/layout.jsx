@@ -21,8 +21,7 @@ export function Header() {
         <header className="sticky top-0 z-50 w-full border-b border-makini-clay/20 bg-makini-earth text-white shadow-sm">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 <Link to="/" className="flex items-center gap-2" onClick={closeMobileMenu}>
-                    <Tractor className="h-8 w-8 text-makini-lightGreen" />
-                    <span className="font-heading text-xl font-bold tracking-tight">Makini</span>
+                    <img src="/Union.png" alt="Makini Logo" className="h-8 w-auto" />
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -121,8 +120,7 @@ export function Footer() {
             <div className="container mx-auto grid grid-cols-1 gap-8 px-4 md:grid-cols-4">
                 <div className="flex flex-col gap-2">
                     <Link to="/" className="flex items-center gap-2">
-                        <Tractor className="h-6 w-6 text-makini-lightGreen" />
-                        <span className="font-heading text-lg font-bold">Makini</span>
+                        <img src="/Union.png" alt="Makini Logo" className="h-8 w-auto" />
                     </Link>
                     <p className="text-sm text-makini-sand/80 mt-2">
                         Conectando agricultores angolanos a equipamentos e serviços de alta qualidade.
