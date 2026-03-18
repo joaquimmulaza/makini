@@ -16,6 +16,7 @@ export default function SearchListings() {
     const initialCategory = searchParams.get('categoria') || 'All';
 
     const [filter, setFilter] = useState(initialCategory);
+    const [locationFilter, setLocationFilter] = useState(searchParams.get('localizacao') || '');
     const [isSearchingContext, setIsSearchingContext] = useState(false);
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -29,6 +30,14 @@ export default function SearchListings() {
     const { user, profile } = useAuth();
     const navigate = useNavigate();
 
+    // Sync state with URL params
+    useEffect(() => {
+        const cat = searchParams.get('categoria') || 'All';
+        const loc = searchParams.get('localizacao') || '';
+        setFilter(cat);
+        setLocationFilter(loc);
+    }, [searchParams]);
+
     useEffect(() => {
         const fetchListings = async () => {
             setLoading(true);
@@ -37,6 +46,10 @@ export default function SearchListings() {
 
             if (filter !== 'All') {
                 query = query.eq('categoria', filter);
+            }
+            
+            if (locationFilter) {
+                query = query.ilike('localizacao', `%${locationFilter}%`);
             }
 
             const { data, error } = await query;
@@ -50,7 +63,7 @@ export default function SearchListings() {
         };
 
         fetchListings();
-    }, [filter]);
+    }, [filter, locationFilter]);
 
     // Simulação de recomendação inteligente
     const simulateGeminiRecommendation = () => {
@@ -115,13 +128,25 @@ export default function SearchListings() {
                                 <Button
                                     key={f}
                                     variant={filter === f ? 'default' : 'outline'}
-                                    onClick={() => setFilter(f)}
+                                    onClick={() => navigate(f === 'All' ? '/buscar' : `/buscar?categoria=${f}`)}
                                     className="rounded-full"
                                 >
                                     {f === 'All' ? 'Todos' : f}
                                 </Button>
                             ))}
                         </div>
+                        {locationFilter && (
+                            <div className="flex items-center gap-2 mt-4 text-sm text-makini-clay animate-fade-in">
+                                <MapPin className="w-4 h-4 text-makini-green" />
+                                <span>A mostrar resultados para: <strong className="text-makini-earth">{locationFilter}</strong></span>
+                                <button 
+                                    onClick={() => navigate('/buscar' + (filter !== 'All' ? `?categoria=${filter}` : ''))}
+                                    className="ml-2 text-xs text-red-500 hover:underline font-medium"
+                                >
+                                    Limpar localização
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* <Button
