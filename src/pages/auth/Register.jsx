@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Tractor, Plane } from 'lucide-react';
+import { Tractor, Plane, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '../../components/ui/button.jsx';
 import { Card, CardContent } from '../../components/ui/card.jsx';
@@ -12,6 +12,7 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [nif, setNif] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -184,14 +185,24 @@ export default function Register() {
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-makini-earth">Palavra-passe</label>
-                            <input
-                                aria-label="Palavra-passe"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-2 border border-makini-clay/30 rounded-md focus:outline-none focus:border-makini-green focus:ring-1 focus:ring-makini-green"
-                            />
+                            <div className="relative">
+                                <input
+                                    aria-label="Palavra-passe"
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full p-2 pr-10 border border-makini-clay/30 rounded-md focus:outline-none focus:border-makini-green focus:ring-1 focus:ring-makini-green"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-makini-clay hover:text-makini-earth focus:outline-none"
+                                >
+                                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                            </div>
                         </div>
 
                         {role === 'fornecedor' && (

@@ -3,13 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button.jsx';
 import { Card, CardContent } from '../../components/ui/card.jsx';
 import { supabase } from '../../lib/supabase';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { user, profile, loading: authLoading } = useAuth();
@@ -98,14 +99,24 @@ export default function Login() {
                                 <label className="text-sm font-medium text-makini-earth">Palavra-passe</label>
                                 <Link to="#" className="text-xs text-makini-green hover:underline">Esqueceu?</Link>
                             </div>
-                            <input
-                                aria-label="Palavra-passe"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-2 border border-makini-clay/30 rounded-md focus:outline-none focus:border-makini-green focus:ring-1 focus:ring-makini-green"
-                            />
+                            <div className="relative">
+                                <input
+                                    aria-label="Palavra-passe"
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full p-2 pr-10 border border-makini-clay/30 rounded-md focus:outline-none focus:border-makini-green focus:ring-1 focus:ring-makini-green"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-makini-clay hover:text-makini-earth focus:outline-none"
+                                >
+                                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                            </div>
                         </div>
 
                         <Button type="submit" disabled={loading} className="w-full mt-6 bg-makini-green hover:bg-makini-green/90">

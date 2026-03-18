@@ -110,4 +110,27 @@ describe('Login Component', () => {
             expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
         });
     });
+    it('should toggle password visibility when clicking the eye icon', () => {
+        useAuth.mockReturnValue({ user: null, profile: null });
+
+        render(
+            <BrowserRouter>
+                <Login />
+            </BrowserRouter>
+        );
+
+        const passwordInput = screen.getByLabelText('Palavra-passe');
+        const toggleButton = screen.getByLabelText('Mostrar senha');
+
+        // Initial state should be password
+        expect(passwordInput.getAttribute('type')).toBe('password');
+
+        // Click to show password
+        fireEvent.click(toggleButton);
+        expect(passwordInput.getAttribute('type')).toBe('text');
+
+        // Click again to hide password
+        fireEvent.click(screen.getByLabelText('Esconder senha'));
+        expect(passwordInput.getAttribute('type')).toBe('password');
+    });
 });
