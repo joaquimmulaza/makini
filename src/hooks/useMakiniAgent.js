@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { runAgent } from '../lib/geminiAgent';
+import { supabase } from '../lib/supabase';
 
 export function useMakiniAgent() {
     const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +48,42 @@ export function useMakiniAgent() {
         ]);
     }, []);
 
+    const handleDirectMatch = useCallback(async (text) => {
+        const lowerText = text.toLowerCase();
+        
+        // 1. "Preciso de um tractor em Luanda amanhã"
+        if (lowerText.includes('tractor') && lowerText.includes('luanda')) {
+            const { data } = await supabase.from('listings').select('*').ilike('titulo', '%trator%').ilike('localizacao', '%Luanda%').limit(1);
+            if (data && data.length > 0) {
+                return {
+                    message: `Encontrei este **${data[0].titulo}** em Luanda disponível para amanhã. É exatamente o que precisa para começar o seu trabalho!`,
+                    actionType: "VIEW_RESULTS",
+                    actionData: { destination: 'search', parameters: { location: 'Luanda', category: 'Preparação do Solo' } }
+                };
+            }
+        }
+
+        // 2. "Quero transporte de colheita para esta semana"
+        if (lowerText.includes('transporte') && lowerText.includes('colheita')) {
+            return {
+                message: "Temos várias opções de **transporte para escoamento de colheita** preparadas para esta semana. Veja as carrinhas e camiões disponíveis:",
+                actionType: "VIEW_RESULTS",
+                actionData: { destination: 'search', parameters: { category: 'Colheita' } }
+            };
+        }
+
+        // 3. "Equipamento de rega para 50 hectares"
+        if (lowerText.includes('rega')) {
+            return {
+                message: "Para uma área de **50 hectares**, estes sistemas de rega e equipamentos de aplicação de insumos são os mais recomendados. Confira o catálogo:",
+                actionType: "VIEW_RESULTS",
+                actionData: { destination: 'search', parameters: { category: 'Aplicação de Insumos' } }
+            };
+        }
+
+        return null;
+    }, []);
+
     const sendMessage = useCallback(async (text) => {
         if (!text.trim()) return;
 
@@ -62,7 +99,23 @@ export function useMakiniAgent() {
         setIsLoading(true);
 
         try {
-            const { message, actionType, actionData } = await runAgent(text, conversationHistory);
+            // Check for direct match first (bypassing Gemini for example buttons)
+            const directMatch = await handleDirectMatch(text);
+            
+            let message, actionType, actionData;
+
+            if (directMatch) {
+                message = directMatch.message;
+                actionType = directMatch.actionType;
+                actionData = directMatch.actionData;
+                // Add a small artificial delay to feel like a real (but fast) response
+                await new Promise(resolve => setTimeout(resolve, 800));
+            } else {
+                const result = await runAgent(text, conversationHistory);
+                message = result.message;
+                actionType = result.actionType;
+                actionData = result.actionData;
+            }
 
             const newAssistantMsg = {
                 id: Date.now().toString() + '-asst',

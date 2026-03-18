@@ -57,9 +57,7 @@ export default function AgentInput({ onSend, isLoading }) {
                         </svg>
                     </button>
                 </div>
-                <p className="text-[11px] text-gray-400 text-center mt-2 font-medium">
-                    Powered by Gemini AI
-                </p>
+               
             </form>
         </div>
     );
