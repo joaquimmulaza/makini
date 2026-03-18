@@ -22,7 +22,7 @@ export default function Login() {
             if (profile.role === 'fornecedor') {
                 navigate('/dashboard');
             } else {
-                navigate('/buscar');
+                navigate('/');
             }
         }
     }, [user, profile, authLoading, navigate]);
@@ -62,7 +62,7 @@ export default function Login() {
             if (profile?.role === 'fornecedor') {
                 navigate('/dashboard');
             } else {
-                navigate('/buscar');
+                navigate('/');
             }
         }
     };

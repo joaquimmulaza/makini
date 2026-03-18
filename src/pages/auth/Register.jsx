@@ -26,7 +26,7 @@ export default function Register() {
             if (profile.role === 'fornecedor') {
                 navigate('/dashboard');
             } else {
-                navigate('/buscar');
+                navigate('/');
             }
         }
     }, [user, profile, authLoading, navigate]);

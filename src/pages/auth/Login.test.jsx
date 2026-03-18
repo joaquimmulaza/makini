@@ -88,7 +88,7 @@ describe('Login Component', () => {
 
         // The useEffect should trigger a redirect immediately
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/buscar');
+            expect(mockNavigate).toHaveBeenCalledWith('/');
         });
     });
 
