@@ -1,0 +1,329 @@
+{
+  "version": 2,
+  "skills": {
+    "best-practices": {
+      "name": "best-practices",
+      "source": "local",
+      "contentHash": "2abba650ba22a819e67f8c2fb09d0f5f33a24d66d945ee2ef824751bc97151ce",
+      "installedAt": "2026-04-05T23:23:18.367Z",
+      "updatedAt": "2026-04-05T23:23:22.084Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "coding-guidelines": {
+      "name": "coding-guidelines",
+      "source": "local",
+      "contentHash": "28a414c715d3c41aae28a25e2f109813ec3f246f76b5567c1e7d6a128cd289ff",
+      "installedAt": "2026-04-05T23:23:18.385Z",
+      "updatedAt": "2026-04-05T23:23:22.092Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "component-common-domain-detection": {
+      "name": "component-common-domain-detection",
+      "source": "local",
+      "contentHash": "58c72d63eaf387cf11ae36b223ff80478ba861f53265e42a3c4fbcb3bc739208",
+      "installedAt": "2026-04-05T23:23:18.463Z",
+      "updatedAt": "2026-04-05T23:23:22.107Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "component-flattening-analysis": {
+      "name": "component-flattening-analysis",
+      "source": "local",
+      "contentHash": "085696b944897a2d8c96efb6e0a3faab00f910a62a49a45c3293c32458962411",
+      "installedAt": "2026-04-05T23:23:18.489Z",
+      "updatedAt": "2026-04-05T23:23:22.127Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "component-identification-sizing": {
+      "name": "component-identification-sizing",
+      "source": "local",
+      "contentHash": "8ec5eb90e86cc84a346f15f50c86960d8f4ba6876f6fe27d687a1ba43a2448a0",
+      "installedAt": "2026-04-05T23:23:18.504Z",
+      "updatedAt": "2026-04-05T23:23:22.160Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "docs-writer": {
+      "name": "docs-writer",
+      "source": "local",
+      "contentHash": "c49827c59d2e27d313731dfd36314cfde0e8dbf15be0e8f813d2f8b751546b0c",
+      "installedAt": "2026-04-05T23:23:18.549Z",
+      "updatedAt": "2026-04-05T23:23:22.172Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "frontend-blueprint": {
+      "name": "frontend-blueprint",
+      "source": "local",
+      "contentHash": "c79c5acbf69e88e1b0c848e64afb671f33091e32b6dcb1b2e6f9c78213a10ec3",
+      "installedAt": "2026-04-05T23:23:18.574Z",
+      "updatedAt": "2026-04-05T23:23:22.191Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "frontend-design": {
+      "name": "frontend-design",
+      "source": "local",
+      "contentHash": "b20162c8d6bcdd9137c4afceaeb4f9dce2c1ba3ccb57a96a3228b8cb33104ec4",
+      "installedAt": "2026-04-05T23:23:18.623Z",
+      "updatedAt": "2026-04-05T23:23:22.216Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "perf-web-optimization": {
+      "name": "perf-web-optimization",
+      "source": "local",
+      "contentHash": "864bb35d6ec7e7755181886b57709b76d8b5da5181a6d8480cd412dd772f1ffb",
+      "installedAt": "2026-04-05T23:23:18.638Z",
+      "updatedAt": "2026-04-05T23:23:22.256Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "playwright-skill": {
+      "name": "playwright-skill",
+      "source": "local",
+      "contentHash": "9c45020d33af9ac2d44c89721f154c94bd73b9d8590117597b9a26920ff9cecc",
+      "installedAt": "2026-04-05T23:23:18.659Z",
+      "updatedAt": "2026-04-05T23:23:22.274Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "react-best-practices": {
+      "name": "react-best-practices",
+      "source": "local",
+      "contentHash": "e96f99e13dc2acc75efc1793aee08fe244802a97a4e190af38bd5a871a5c9636",
+      "installedAt": "2026-04-05T23:23:18.856Z",
+      "updatedAt": "2026-04-05T23:23:22.437Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "security-best-practices": {
+      "name": "security-best-practices",
+      "source": "local",
+      "contentHash": "6fec09f7e43bb297ad6097e13469e85aa5b5d671a839b4f7e7871ef8eaa76c4e",
+      "installedAt": "2026-04-05T23:23:18.898Z",
+      "updatedAt": "2026-04-05T23:23:22.487Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "subagent-creator": {
+      "name": "subagent-creator",
+      "source": "local",
+      "contentHash": "bef6b5a9f23b3186af259c1041c2561e9af15fa94810009d72d775bb217aa3ca",
+      "installedAt": "2026-04-05T23:23:18.932Z",
+      "updatedAt": "2026-04-05T23:23:22.499Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "technical-design-doc-creator": {
+      "name": "technical-design-doc-creator",
+      "source": "local",
+      "contentHash": "d05974df076f695f96b4e4c263ad19f2aaffe8ee6248c1b07a634dd9ed0ea51e",
+      "installedAt": "2026-04-05T23:23:18.953Z",
+      "updatedAt": "2026-04-05T23:23:22.508Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "the-fool": {
+      "name": "the-fool",
+      "source": "local",
+      "contentHash": "b761f983e21e00173ac42760f478095a3e8c733862c20d9f711d10d962f407cc",
+      "installedAt": "2026-04-05T23:23:18.985Z",
+      "updatedAt": "2026-04-05T23:23:22.565Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "tlc-spec-driven": {
+      "name": "tlc-spec-driven",
+      "source": "local",
+      "contentHash": "79d0e1b750dfc70820ac0152d9ca78927c398f669397e9cdb8bb812ceca2fbc6",
+      "installedAt": "2026-04-05T23:23:19.057Z",
+      "updatedAt": "2026-04-05T23:23:22.615Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "web-design-guidelines": {
+      "name": "web-design-guidelines",
+      "source": "local",
+      "contentHash": "213a23fff251b12ddfec648bda148bf10704ef6617e162eb9329cc83963dd138",
+      "installedAt": "2026-04-05T23:23:19.100Z",
+      "updatedAt": "2026-04-05T23:23:22.673Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "web-quality-audit": {
+      "name": "web-quality-audit",
+      "source": "local",
+      "contentHash": "8af5bd3453984bdcef903709b6ef0606b12ae1badb6dd5b5b382b930d2594d7c",
+      "installedAt": "2026-04-05T23:23:19.118Z",
+      "updatedAt": "2026-04-05T23:23:22.689Z",
+      "agents": [
+        "cursor",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "trae"
+      ],
+      "method": "copy",
+      "global": false
+    }
+  }
+}
