@@ -32,15 +32,39 @@ async function seed() {
         // For local tests where RLS is bypassed via Postgres login, we can disable RLS temporarily
         await client.query(`ALTER TABLE public.listings DISABLE ROW LEVEL SECURITY;`);
 
-        // Insert listings
+        // Insert listings in batch
+        const values = [];
+        const placeholders = [];
+        let paramCount = 1;
+
         for (const eq of MOCK_EQUIPMENTS) {
-            await client.query(`
-        INSERT INTO public.listings 
-        (fornecedor_id, tipo, categoria, titulo, capacidade_especificacao, nome_empresa, preco, disponibilidade, localizacao)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      `, ['bf6d9768-ac6a-4ff1-86b6-be9fb5984713' /* any uuid since RLS is disabled temporarily */, eq.tipo, eq.categoria, eq.titulo, eq.capacidade_especificacao, eq.nome_empresa, eq.preco, eq.disponibilidade, eq.localizacao]
-            ).catch(e => {
+            const rowPlaceholders = [];
+            for (let i = 0; i < 9; i++) {
+                rowPlaceholders.push(`$${paramCount++}`);
+            }
+            placeholders.push(`(${rowPlaceholders.join(', ')})`);
+            values.push(
+                'bf6d9768-ac6a-4ff1-86b6-be9fb5984713', // fornecedor_id
+                eq.tipo,
+                eq.categoria,
+                eq.titulo,
+                eq.capacidade_especificacao,
+                eq.nome_empresa,
+                eq.preco,
+                eq.disponibilidade,
+                eq.localizacao
+            );
+        }
+
+        if (MOCK_EQUIPMENTS.length > 0) {
+            const query = `
+                INSERT INTO public.listings
+                (fornecedor_id, tipo, categoria, titulo, capacidade_especificacao, nome_empresa, preco, disponibilidade, localizacao)
+                VALUES ${placeholders.join(', ')}
+            `;
+            await client.query(query, values).catch(e => {
                 // We catch UUID error just in case it enforces the FK constraint strongly
+                console.error('Batch insert error:', e);
             });
         }
 
