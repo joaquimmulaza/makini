@@ -1,11 +1,22 @@
 import pg from 'pg';
 
+/**
+ * PRODUCTION-GRADE SEED SCRIPT
+ *
+ * Features:
+ * - Security: Uses environment variables (DATABASE_URL) and removes hardcoded secrets.
+ * - Safety: All operations wrapped in a database transaction.
+ * - Scalability: Implements chunked batch inserts (default 500 rows).
+ * - Robustness: Comprehensive error handling and structured logging.
+ * - Maintainability: Clean code with extracted constants.
+ */
+
 const { Client } = pg;
 
-const client = new Client({
-    connectionString: 'postgresql://postgres:angolamakini2026@db.lrfmxjdxyjlwzsfeixut.supabase.co:5432/postgres',
-    ssl: { rejectUnauthorized: false }
-});
+// Configuration Constants
+const DATABASE_URL = process.env.DATABASE_URL;
+const CHUNK_SIZE = 500;
+const DEFAULT_FORNECEDOR_ID = 'bf6d9768-ac6a-4ff1-86b6-be9fb5984713';
 
 const MOCK_EQUIPMENTS = [
     { tipo: 'equipamento', titulo: 'Tractor agrícola', capacidade_especificacao: '75–120 HP', nome_empresa: 'Fazenda Sol Nascente', preco: 15000, disponibilidade: 'imediata', localizacao: 'Benguela', categoria: 'Preparação do Solo' },
@@ -19,62 +30,138 @@ const MOCK_EQUIPMENTS = [
     { tipo: 'servico', titulo: 'Aluguer de Trator + Aragem', capacidade_especificacao: 'Por dia', nome_empresa: 'Micromec', preco: 280000, disponibilidade: 'imediata', localizacao: 'Várias', categoria: 'Prestação de Serviços' },
 ];
 
-async function seed() {
+/**
+ * Seed the database with mock equipment listings.
+ */
+async function seed(ClientOverride = Client) {
+    if (!DATABASE_URL && ClientOverride === Client) {
+        throw new Error('[SEED] Missing DATABASE_URL environment variable.');
+    }
+
+    const client = new ClientOverride({
+        connectionString: DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+    });
+
+    console.log('[SEED] Starting database seeding process...');
+
+    let isConnected = false;
+    let rlsDisabled = false;
+
     try {
         await client.connect();
-        console.log('Connected. Starting seeding...');
+        isConnected = true;
+        console.log('[SEED] Connected to PostgreSQL.');
 
-        // 1. Create a mock Fornecedor profile directly in the public schema 
-        // Usually auth triggers this, but we'll insert a mock row to link listings.
-        const mockUserId = '11111111-1111-1111-1111-111111111111';
+        // Start Transaction
+        await client.query('BEGIN');
+        console.log('[SEED] Transaction started.');
 
-        // Check if auth user exists for our mock profile (needs corresponding auth.users insert in a real system)
-        // For local tests where RLS is bypassed via Postgres login, we can disable RLS temporarily
-        await client.query(`ALTER TABLE public.listings DISABLE ROW LEVEL SECURITY;`);
+        // Disable RLS temporarily for mass insertion
+        await client.query('ALTER TABLE public.listings DISABLE ROW LEVEL SECURITY;');
+        rlsDisabled = true;
+        console.log('[SEED] Row Level Security (RLS) disabled.');
 
-        // Insert listings in batch
-        const values = [];
-        const placeholders = [];
-        let paramCount = 1;
+        // Process data in chunks
+        for (let i = 0; i < MOCK_EQUIPMENTS.length; i += CHUNK_SIZE) {
+            const chunk = MOCK_EQUIPMENTS.slice(i, i + CHUNK_SIZE);
+            const values = [];
+            const placeholders = [];
+            let paramCount = 1;
 
-        for (const eq of MOCK_EQUIPMENTS) {
-            const rowPlaceholders = [];
-            for (let i = 0; i < 9; i++) {
-                rowPlaceholders.push(`$${paramCount++}`);
+            console.log(`[SEED] Processing batch ${Math.floor(i / CHUNK_SIZE) + 1} (Size: ${chunk.length})...`);
+
+            for (const eq of chunk) {
+                const rowPlaceholders = [];
+                for (let j = 0; j < 9; j++) {
+                    rowPlaceholders.push(`$${paramCount++}`);
+                }
+                placeholders.push(`(${rowPlaceholders.join(', ')})`);
+                values.push(
+                    DEFAULT_FORNECEDOR_ID,
+                    eq.tipo,
+                    eq.categoria,
+                    eq.titulo,
+                    eq.capacidade_especificacao,
+                    eq.nome_empresa,
+                    eq.preco,
+                    eq.disponibilidade,
+                    eq.localizacao
+                );
             }
-            placeholders.push(`(${rowPlaceholders.join(', ')})`);
-            values.push(
-                'bf6d9768-ac6a-4ff1-86b6-be9fb5984713', // fornecedor_id
-                eq.tipo,
-                eq.categoria,
-                eq.titulo,
-                eq.capacidade_especificacao,
-                eq.nome_empresa,
-                eq.preco,
-                eq.disponibilidade,
-                eq.localizacao
-            );
+
+            if (chunk.length > 0) {
+                const query = `
+                    INSERT INTO public.listings
+                    (fornecedor_id, tipo, categoria, titulo, capacidade_especificacao, nome_empresa, preco, disponibilidade, localizacao)
+                    VALUES ${placeholders.join(', ')}
+                `;
+
+                try {
+                    await client.query(query, values);
+                } catch (batchError) {
+                    console.error(`[SEED] Batch insert failed at index ${i}:`, {
+                        batchSize: chunk.length,
+                        message: batchError.message
+                    });
+                    throw batchError; // Trigger rollback
+                }
+            }
         }
 
-        if (MOCK_EQUIPMENTS.length > 0) {
-            const query = `
-                INSERT INTO public.listings
-                (fornecedor_id, tipo, categoria, titulo, capacidade_especificacao, nome_empresa, preco, disponibilidade, localizacao)
-                VALUES ${placeholders.join(', ')}
-            `;
-            await client.query(query, values).catch(e => {
-                // We catch UUID error just in case it enforces the FK constraint strongly
-                console.error('Batch insert error:', e);
-            });
-        }
+        // Re-enable RLS
+        await client.query('ALTER TABLE public.listings ENABLE ROW LEVEL SECURITY;');
+        rlsDisabled = false;
+        console.log('[SEED] Row Level Security (RLS) re-enabled.');
 
-        console.log('Seeded data successfully!');
+        // Commit Transaction
+        await client.query('COMMIT');
+        console.log('[SEED] Seeding successful! Transaction committed.');
+
     } catch (err) {
-        console.error('Seeding error:', err);
+        // Rollback on any failure
+        console.error('[SEED] Seeding error encountered. Attempting rollback...', {
+            message: err.message
+        });
+
+        if (isConnected) {
+            try {
+                await client.query('ROLLBACK');
+                console.log('[SEED] Rollback complete.');
+
+                // Ensure RLS is re-enabled even on rollback if it was disabled
+                if (rlsDisabled) {
+                    await client.query('ALTER TABLE public.listings ENABLE ROW LEVEL SECURITY;');
+                    console.log('[SEED] Row Level Security (RLS) re-enabled after rollback.');
+                }
+            } catch (rollbackErr) {
+                console.error('[SEED] Failed to rollback or re-enable RLS:', rollbackErr.message);
+            }
+        }
+
+        // Re-throw the error to ensure proper exit code when run from CLI
+        throw err;
     } finally {
-        await client.query(`ALTER TABLE public.listings ENABLE ROW LEVEL SECURITY;`);
-        await client.end();
+        // Always close the connection
+        if (isConnected) {
+            try {
+                await client.end();
+                console.log('[SEED] Connection closed.');
+            } catch (endErr) {
+                console.error('[SEED] Error closing connection:', endErr.message);
+            }
+        }
     }
 }
 
-seed();
+// Run the script if executed directly
+const isMain = import.meta.url.endsWith(process.argv[1]) || (process.argv[1] && import.meta.url.includes(process.argv[1]));
+if (isMain) {
+    // Note: Use 'node --env-file=.env seed-db.js' in Node.js 20.6+ or an external loader for .env support
+    seed().catch(err => {
+        console.error('[SEED] Fatal error:', err.message);
+        process.exit(1);
+    });
+}
+
+export { seed };
