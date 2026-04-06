@@ -11,9 +11,23 @@ const RobotAvatar = () => (
 );
 
 export default function AgentMessage({ message, isAssistant }) {
-    // Use dangerouslySetInnerHTML sparingly. Assuming message is raw text, simple formatting
-    // Let's replace asterisks with strong tags to support simple markdown from Gemini
-    const formattedContent = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Safely render message content by splitting by markdown bold markers (**)
+    // and rendering them as React elements instead of using dangerouslySetInnerHTML.
+    const renderContent = (content) => {
+        if (!isAssistant) return <span>{content}</span>;
+
+        const parts = content.split(/(\*\*.*?\*\*)/g);
+        return (
+            <span>
+                {parts.map((part, index) => {
+                    if (part.startsWith('**') && part.endsWith('**')) {
+                        return <strong key={index}>{part.slice(2, -2)}</strong>;
+                    }
+                    return <span key={index}>{part}</span>;
+                })}
+            </span>
+        );
+    };
 
     return (
         <div className={`flex w-full min-w-0 ${isAssistant ? 'justify-start' : 'justify-end'} mb-4 animate-fade-in-up`}>
@@ -27,11 +41,7 @@ export default function AgentMessage({ message, isAssistant }) {
                     }
         `}
             >
-                {isAssistant ? (
-                    <span dangerouslySetInnerHTML={{ __html: formattedContent }} />
-                ) : (
-                    <span>{message}</span>
-                )}
+                {renderContent(message)}
             </div>
         </div>
     );
