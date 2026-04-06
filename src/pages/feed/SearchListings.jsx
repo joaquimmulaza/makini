@@ -6,7 +6,7 @@ import { Card, CardContent } from '../../components/ui/card.jsx';
 import { Button } from '../../components/ui/button.jsx';
 import { Badge } from '../../components/ui/badge.jsx';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog.jsx';
-import { MapPin, Calendar, Banknote, Sparkles, Loader2 } from 'lucide-react';
+import { MapPin, Banknote, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { CATEGORIAS_NOMES } from '../../lib/categorias';
@@ -17,7 +17,6 @@ export default function SearchListings() {
 
     const [filter, setFilter] = useState(initialCategory);
     const [locationFilter, setLocationFilter] = useState(searchParams.get('localizacao') || '');
-    const [isSearchingContext, setIsSearchingContext] = useState(false);
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -64,15 +63,6 @@ export default function SearchListings() {
 
         fetchListings();
     }, [filter, locationFilter]);
-
-    // Simulação de recomendação inteligente
-    const simulateGeminiRecommendation = () => {
-        setIsSearchingContext(true);
-        setTimeout(() => {
-            setFilter('Preparação do Solo'); // simulação
-            setIsSearchingContext(false);
-        }, 1500);
-    };
 
     const handleReservationSubmit = async (e) => {
         e.preventDefault();
@@ -149,14 +139,6 @@ export default function SearchListings() {
                         )}
                     </div>
 
-                    {/* <Button
-                        onClick={simulateGeminiRecommendation}
-                        disabled={isSearchingContext}
-                        className="bg-makini-earth hover:bg-makini-clay text-white max-w-xs whitespace-normal h-auto py-3 px-4 flex items-center gap-2"
-                    >
-                        <Sparkles className="w-5 h-5 text-makini-lightGreen" />
-                        {isSearchingContext ? 'Mapeando contexto...' : 'Recomendação Inteligente'}
-                    </Button> */}
                 </div>
 
                 {loading ? (
