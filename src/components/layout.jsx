@@ -75,7 +75,14 @@ export function Header() {
                                 </>
                             )}
                         </div>
-                        <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-makini-clay" onClick={toggleMobileMenu}>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="md:hidden text-white hover:bg-makini-clay"
+                            onClick={toggleMobileMenu}
+                            aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+                            aria-expanded={isMobileMenuOpen}
+                        >
                             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                         </Button>
                     </div>
