@@ -48,15 +48,24 @@ export function Header() {
                             {user ? (
                                 <div className="flex items-center gap-8">
                                     <span className="text-sm font-medium text-makini-sand hidden lg:block">
-                                        Olá, {profile?.nome_completo || user.email}
+                                        Olá, {profile?.nome || user.email}
                                     </span>
-                                    {profile?.role === 'fornecedor' && (
-                                        <Button variant="ghost" asChild className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+
+                                <Button variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                    <Link to="/perfil" className="flex items-center gap-2"><User className="w-4 h-4" /> Perfil</Link>
+                                </Button>
+                                {profile?.role === 'fornecedor' && (
+                                        <Button variant="ghost" className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
                                             <Link to="/dashboard" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Painel</Link>
                                         </Button>
                                     )}
-                                    {profile?.role === 'agricultor' && (
-                                        <Button variant="ghost" asChild className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+
+                                    <Button variant="ghost" className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+                                        <Link to="/perfil" className="flex items-center gap-2"><User className="w-4 h-4" /> Perfil</Link>
+                                    </Button>
+
+                                {profile?.role === 'agricultor' && (
+                                        <Button variant="ghost" className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
                                             <Link to="/minhas-reservas" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Minhas Reservas</Link>
                                         </Button>
                                     )}
@@ -66,10 +75,10 @@ export function Header() {
                                 </div>
                             ) : (
                                 <>
-                                    <Button variant="ghost" asChild className="text-white hover:bg-makini-clay hover:text-white">
+                                    <Button variant="ghost" className="text-white hover:bg-makini-clay hover:text-white">
                                         <Link to="/login">Entrar</Link>
                                     </Button>
-                                    <Button variant="default" asChild>
+                                    <Button variant="default">
                                         <Link to="/register">Registar</Link>
                                     </Button>
                                 </>
@@ -102,15 +111,19 @@ export function Header() {
                         {user ? (
                             <>
                                 <span className="text-sm font-medium text-makini-sand mb-2 px-2">
-                                    Olá, {profile?.nome_completo || user.email}
+                                    Olá, {profile?.nome || user.email}
                                 </span>
+
+                                <Button variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                    <Link to="/perfil" className="flex items-center gap-2"><User className="w-4 h-4" /> Perfil</Link>
+                                </Button>
                                 {profile?.role === 'fornecedor' && (
-                                    <Button variant="ghost" asChild className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                    <Button variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
                                         <Link to="/dashboard" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Painel</Link>
                                     </Button>
                                 )}
                                 {profile?.role === 'agricultor' && (
-                                    <Button variant="ghost" asChild className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                    <Button variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
                                         <Link to="/minhas-reservas" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Minhas Reservas</Link>
                                     </Button>
                                 )}
@@ -120,10 +133,10 @@ export function Header() {
                             </>
                         ) : (
                             <>
-                                <Button variant="ghost" asChild className="justify-start px-2 text-white hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                <Button variant="ghost" className="justify-start px-2 text-white hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
                                     <Link to="/login">Entrar</Link>
                                 </Button>
-                                <Button variant="default" asChild className="justify-start px-2 mt-2" onClick={closeMobileMenu}>
+                                <Button variant="default" className="justify-start px-2 mt-2" onClick={closeMobileMenu}>
                                     <Link to="/register" className="w-full text-center">Registar</Link>
                                 </Button>
                             </>
