@@ -36,14 +36,22 @@ export default function Home() {
     useEffect(() => {
         // Buscar contagem real de anúncios por categoria
         const fetchCounts = async () => {
-            const { data } = await supabase
-                .from('listings')
-                .select('categoria');
-            if (data) {
-                const c = {};
-                data.forEach(l => { c[l.categoria] = (c[l.categoria] || 0) + 1; });
-                setCounts(c);
-            }
+            // ⚡ Bolt Optimization: Use HEAD requests with count='exact' in parallel
+            // instead of fetching the entire table and counting on the client.
+            // This reduces network payload from O(N) to O(1) and uses the database efficiently.
+            const c = {};
+            await Promise.all(
+                CATEGORIAS.map(async (cat) => {
+                    const { count, error } = await supabase
+                        .from('listings')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('categoria', cat.nome);
+                    if (!error && count !== null) {
+                        c[cat.nome] = count;
+                    }
+                })
+            );
+            setCounts(c);
         };
         fetchCounts();
     }, []);
