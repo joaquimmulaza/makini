@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Tractor, Menu, LogOut, LayoutDashboard, X } from 'lucide-react'
+import { Tractor, Menu, LogOut, LayoutDashboard, X, User } from 'lucide-react'
 import { Button } from './ui/button.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
@@ -51,21 +51,17 @@ export function Header() {
                                         Olá, {profile?.nome || user.email}
                                     </span>
 
-                                <Button variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                <Button asChild variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
                                     <Link to="/perfil" className="flex items-center gap-2"><User className="w-4 h-4" /> Perfil</Link>
                                 </Button>
                                 {profile?.role === 'fornecedor' && (
-                                        <Button variant="ghost" className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+                                        <Button asChild variant="ghost" className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
                                             <Link to="/dashboard" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Painel</Link>
                                         </Button>
                                     )}
 
-                                    <Button variant="ghost" className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
-                                        <Link to="/perfil" className="flex items-center gap-2"><User className="w-4 h-4" /> Perfil</Link>
-                                    </Button>
-
                                 {profile?.role === 'agricultor' && (
-                                        <Button variant="ghost" className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
+                                        <Button asChild variant="ghost" className="text-makini-lightGreen hover:bg-makini-clay hover:text-white">
                                             <Link to="/minhas-reservas" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Minhas Reservas</Link>
                                         </Button>
                                     )}
@@ -75,10 +71,10 @@ export function Header() {
                                 </div>
                             ) : (
                                 <>
-                                    <Button variant="ghost" className="text-white hover:bg-makini-clay hover:text-white">
+                                    <Button asChild variant="ghost" className="text-white hover:bg-makini-clay hover:text-white">
                                         <Link to="/login">Entrar</Link>
                                     </Button>
-                                    <Button variant="default">
+                                    <Button asChild variant="default">
                                         <Link to="/register">Registar</Link>
                                     </Button>
                                 </>
@@ -114,16 +110,16 @@ export function Header() {
                                     Olá, {profile?.nome || user.email}
                                 </span>
 
-                                <Button variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                <Button asChild variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
                                     <Link to="/perfil" className="flex items-center gap-2"><User className="w-4 h-4" /> Perfil</Link>
                                 </Button>
                                 {profile?.role === 'fornecedor' && (
-                                    <Button variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                    <Button asChild variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
                                         <Link to="/dashboard" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Painel</Link>
                                     </Button>
                                 )}
                                 {profile?.role === 'agricultor' && (
-                                    <Button variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                    <Button asChild variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
                                         <Link to="/minhas-reservas" className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Minhas Reservas</Link>
                                     </Button>
                                 )}
@@ -133,10 +129,10 @@ export function Header() {
                             </>
                         ) : (
                             <>
-                                <Button variant="ghost" className="justify-start px-2 text-white hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
+                                <Button asChild variant="ghost" className="justify-start px-2 text-white hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
                                     <Link to="/login">Entrar</Link>
                                 </Button>
-                                <Button variant="default" className="justify-start px-2 mt-2" onClick={closeMobileMenu}>
+                                <Button asChild variant="default" className="justify-start px-2 mt-2" onClick={closeMobileMenu}>
                                     <Link to="/register" className="w-full text-center">Registar</Link>
                                 </Button>
                             </>

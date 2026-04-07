@@ -190,6 +190,7 @@ export default function Register() {
                                     aria-label="Palavra-passe"
                                     type={showPassword ? "text" : "password"}
                                     required
+                                    autoComplete="new-password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="w-full p-2 pr-10 border border-makini-clay/30 rounded-md focus:outline-none focus:border-makini-green focus:ring-1 focus:ring-makini-green"
