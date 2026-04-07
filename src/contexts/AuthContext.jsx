@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { fetchProfileByUserId } from '../lib/profileDomain.ts';
 
 const AuthContext = createContext({});
 
@@ -8,8 +9,20 @@ export const AuthProvider = ({ children }) => {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const fetchProfile = async (userId) => {
+        try {
+            const nextProfile = await fetchProfileByUserId(userId);
+            setProfile(nextProfile || null);
+            return nextProfile || null;
+        } catch (error) {
+            console.error('Erro ao carregar perfil:', error);
+            setProfile(null);
+            return null;
+        }
+    };
+
     useEffect(() => {
-        // Obter sessão atual
+        // Obter sessao atual
         const getSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             setUser(session?.user || null);
@@ -21,7 +34,7 @@ export const AuthProvider = ({ children }) => {
 
         getSession();
 
-        // Escutar mudanças de autenticação
+        // Escutar mudancas de autenticacao
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             setUser(session?.user || null);
             if (session?.user) {
@@ -34,29 +47,27 @@ export const AuthProvider = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
-    const fetchProfile = async (userId) => {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
-
-        if (!error && data) {
-            setProfile(data);
+    const refreshProfile = async (nextProfile) => {
+        if (nextProfile) {
+            setProfile(nextProfile);
+            return nextProfile;
         }
+
+        if (!user?.id) return null;
+        return fetchProfile(user.id);
     };
 
     const signOut = async () => {
         const { error } = await supabase.auth.signOut();
         if (error) {
-            console.error('Erro ao terminar sessão:', error);
+            console.error('Erro ao terminar sessao:', error);
         }
         setUser(null);
         setProfile(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, profile, loading, signOut }}>
+        <AuthContext.Provider value={{ user, profile, loading, signOut, refreshProfile }}>
             {children}
         </AuthContext.Provider>
     );

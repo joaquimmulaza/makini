@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Tractor, Menu, LogOut, LayoutDashboard, X, User } from 'lucide-react'
 import { Button } from './ui/button.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import { getProfileDisplayName } from '../lib/profileDomain.ts'
 
 export function Header() {
     const { user, profile, signOut } = useAuth();
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const displayName = getProfileDisplayName(profile, user?.email || '');
 
     const handleLogout = async () => {
         await signOut();
@@ -48,7 +50,7 @@ export function Header() {
                             {user ? (
                                 <div className="flex items-center gap-8">
                                     <span className="text-sm font-medium text-makini-sand hidden lg:block">
-                                        Olá, {profile?.nome || user.email}
+                                        Olá, {displayName}
                                     </span>
 
                                 <Button asChild variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
@@ -107,7 +109,7 @@ export function Header() {
                         {user ? (
                             <>
                                 <span className="text-sm font-medium text-makini-sand mb-2 px-2">
-                                    Olá, {profile?.nome || user.email}
+                                    Olá, {displayName}
                                 </span>
 
                                 <Button asChild variant="ghost" className="justify-start px-2 text-makini-lightGreen hover:bg-makini-clay hover:text-white" onClick={closeMobileMenu}>
@@ -184,3 +186,4 @@ export function Footer() {
         </footer>
     )
 }
+

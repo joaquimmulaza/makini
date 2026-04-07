@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-PT"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#88d982",
+                        "surface-variant": "#e6e2da",
+                        "on-secondary-container": "#5e675a",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#bfcaba",
+                        "on-primary-fixed-variant": "#005312",
+                        "on-error": "#ffffff",
+                        "on-background": "#1c1c17",
+                        "surface-container-highest": "#e6e2da",
+                        "surface-tint": "#1b6d24",
+                        "on-tertiary-fixed": "#2b160e",
+                        "primary-container": "#0d631b",
+                        "surface-dim": "#dddad2",
+                        "primary-fixed": "#a3f69c",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#f1ede6",
+                        "outline": "#707a6c",
+                        "on-surface-variant": "#40493d",
+                        "secondary-fixed": "#dce6d5",
+                        "on-primary-fixed": "#002203",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#e4beb1",
+                        "on-tertiary-container": "#e8c2b5",
+                        "secondary-container": "#dce6d5",
+                        "surface": "#fdf9f1",
+                        "error": "#ba1a1a",
+                        "primary": "#00490e",
+                        "on-secondary-fixed-variant": "#40493d",
+                        "on-primary-container": "#8bdd86",
+                        "inverse-surface": "#31302b",
+                        "surface-bright": "#fdf9f1",
+                        "secondary-fixed-dim": "#c0c9ba",
+                        "inverse-on-surface": "#f4f0e8",
+                        "surface-container-low": "#f7f3eb",
+                        "surface-container-high": "#ece8e0",
+                        "on-secondary-fixed": "#151e14",
+                        "secondary": "#586154",
+                        "primary-fixed-dim": "#88d982",
+                        "tertiary": "#52382e",
+                        "on-surface": "#1c1c17",
+                        "background": "#fdf9f1",
+                        "tertiary-fixed": "#ffdbce",
+                        "tertiary-container": "#6b4f44",
+                        "on-tertiary-fixed-variant": "#5b4136",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow { box-shadow: 0 12px 40px rgba(28, 28, 23, 0.06); }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased">
+<!-- Top Command Bar (TopNavBar Implementation) -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#fdf9f1] dark:bg-stone-950 flex justify-between items-center w-full px-8 py-4 border-b border-[#bfcaba]/20">
+<div class="flex flex-col">
+<h1 class="text-xl font-bold text-[#00490e] dark:text-green-500">Meu Perfil</h1>
+<p class="text-xs font-medium text-stone-500 tracking-tight">Gerencie sua identidade digital e preferências no ecossistema Makini.</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2 text-sm font-medium text-stone-600 hover:bg-[#ece8e0] rounded-lg transition-colors scale-95 duration-150 ease-in-out">
+                Cancelar
+            </button>
+<button class="px-5 py-2 text-sm font-medium text-stone-600 border border-[#bfcaba]/30 rounded-lg hover:bg-[#ece8e0] transition-colors scale-95 duration-150 ease-in-out">
+                Editar
+            </button>
+<button class="px-6 py-2 text-sm font-bold bg-gradient-to-br from-[#00490e] to-[#0d631b] text-white rounded-lg editorial-shadow hover:opacity-90 transition-all scale-95 duration-150 ease-in-out">
+                Salvar Alterações
+            </button>
+</div>
+</header>
+<div class="flex pt-[73px] min-h-screen">
+<!-- Sidebar Navigation (SideNavBar Implementation) -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-73px)] fixed left-0 w-64 bg-[#f7f3eb] dark:bg-stone-900 p-6 space-y-8 border-r border-[#bfcaba]/20">
+<div class="flex flex-col items-start space-y-2 mb-4">
+<div class="flex items-center gap-3">
+<img alt="Joao Manuel" class="w-10 h-10 rounded-full object-cover border-2 border-primary-container/20" data-alt="close-up portrait of a dignified senior african farmer with weather-worn features and a warm expression in soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvc1wuhObKXaukmi5PCEhGZDBvjaFbu226cbST0l5XXYd8lplqLpH_dj-e4uOAlv7JyDWiPO2GUG1HidVIxxMzJajTY2HXpVmoom0z6VTwg9yLB9EQih_5dj8uCldMMvMcyUd1vMjGgTWRsx_v6fs1m_gqDHO_J1vpgVBqENXM_N6YeWgstbWy5GvWMiqOMH__KzjHzYQGIwZjOCTCvSd137-AMOrLDFzTmMaL8tP-8HMGiLk7QWuMJuCp-YTIbtsFQx5Qn3YgDfu7"/>
+<div>
+<h2 class="text-sm font-black text-[#00490e] dark:text-green-500 leading-tight">Produtor Rural</h2>
+<p class="text-[10px] font-medium text-stone-500 uppercase tracking-widest">Premium Member</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:text-[#00490e] hover:bg-[#ece8e0] dark:hover:bg-stone-800/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined text-tertiary">home</span>
+<span class="text-sm font-medium">Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:text-[#00490e] hover:bg-[#ece8e0] dark:hover:bg-stone-800/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined text-tertiary">storefront</span>
+<span class="text-sm font-medium">Marketplace</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:text-[#00490e] hover:bg-[#ece8e0] dark:hover:bg-stone-800/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined text-tertiary">event_available</span>
+<span class="text-sm font-medium">Reservations</span>
+</a>
+<!-- Active Tab: Support or Profile conceptually -->
+<a class="flex items-center gap-3 px-4 py-3 bg-[#ffffff] dark:bg-stone-800 text-[#00490e] dark:text-green-400 rounded-lg font-bold editorial-shadow" href="#">
+<span class="material-symbols-outlined text-primary">contact_support</span>
+<span class="text-sm">Suporte</span>
+</a>
+</nav>
+<button class="w-full py-3 bg-primary-container text-white rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-transform translate-x-0 hover:translate-x-1">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="text-xs font-bold uppercase tracking-wider">Nova Atividade</span>
+</button>
+<div class="pt-6 border-t border-outline-variant/20 space-y-2">
+<a class="flex items-center gap-3 px-4 py-2 text-xs font-medium text-stone-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span>Configurações</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-xs font-medium text-stone-500 hover:text-error transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">logout</span>
+<span>Sair</span>
+</a>
+</div>
+</aside>
+<!-- Main Workspace Canvas -->
+<main class="flex-1 md:ml-64 p-8 bg-background">
+<div class="max-w-6xl mx-auto space-y-8">
+<!-- Section: Identity & Metrics -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Profile Identity Card -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-8 editorial-shadow flex items-center justify-between group overflow-hidden relative">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+<div class="flex items-center gap-6 relative z-10">
+<div class="relative">
+<img alt="Joao Manuel" class="w-24 h-24 rounded-full object-cover border-4 border-surface" data-alt="high quality portrait of a smiling african man in his 50s wearing a clean white linen shirt against a soft blurred rural landscape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJNW0eMeM_L3NRYSIPEjIKiDGTpKaswuH5OBoHnAeudXpJTy3md2BlSbB73PUE16IC8eanUHiuskzkbaa-bjtv5hOXHuNERysugb2_QgSeGeoIA92Z1w3daiHYC2Sg7mX9lqRAw46M7U_XdYveMbdC-N5yPnv5fw02-0TS1RYX7RA6geGVHkN_80C81BdOP5OCKFHOtYrSPLu_COADvPCsJVuqrN9hIOcHV9e0p0U3vSeh9shehiZEqRNdHVxvtZz2lv086G8p6d5W"/>
+<div class="absolute bottom-0 right-0 bg-primary-container text-white text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-white">
+                                    85%
+                                </div>
+</div>
+<div class="space-y-1">
+<h2 class="text-2xl font-extrabold text-on-surface tracking-tight leading-none">Joao Manuel</h2>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded uppercase">AGRICULTOR</span>
+<span class="text-xs text-stone-500 flex items-center">
+<span class="material-symbols-outlined text-sm mr-1">location_on</span>
+                                        Huambo, Angola
+                                    </span>
+</div>
+</div>
+</div>
+<div class="hidden sm:block relative z-10 text-right">
+<div class="inline-flex items-center justify-center p-1 rounded-full bg-surface-container">
+<svg class="w-16 h-16 transform -rotate-90">
+<circle class="text-outline-variant/20" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary-container" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="175.9" stroke-dashoffset="26.4" stroke-width="4"></circle>
+</svg>
+<span class="absolute text-[10px] font-bold text-on-surface">85%</span>
+</div>
+<p class="text-[10px] text-stone-400 font-medium mt-1">PERFIL COMPLETO</p>
+</div>
+</div>
+<!-- Operational Metrics Card (For Fornecedor/Premium) -->
+<div class="lg:col-span-5 bg-surface-container-low rounded-xl p-8 border border-outline-variant/10 flex flex-col justify-between min-h-[144px]">
+<p class="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Estatísticas Operacionais</p>
+<div class="flex justify-between items-end">
+<div class="space-y-0">
+<p class="text-3xl font-black text-primary leading-none">24</p>
+<p class="text-[11px] font-semibold text-stone-500 uppercase tracking-tighter">Reservas Efetuadas</p>
+</div>
+<div class="h-10 w-[1px] bg-outline-variant/30 mx-4"></div>
+<div class="space-y-0 text-right">
+<p class="text-3xl font-black text-stone-400 leading-none">05</p>
+<p class="text-[11px] font-semibold text-stone-500 uppercase tracking-tighter">Anúncios Ativos</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Main Workspace Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Primary Workspace Card: Account Data -->
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-10 editorial-shadow">
+<div class="mb-8">
+<h3 class="text-xl font-bold text-on-surface tracking-tight">Dados da Conta</h3>
+<div class="w-12 h-1 bg-primary-container/20 mt-2 rounded-full"></div>
+</div>
+<form class="space-y-8">
+<!-- Email Read-Only -->
+<div class="space-y-2">
+<label class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Endereço de E-mail (Verificado)</label>
+<div class="flex items-center gap-3 bg-surface-container-low px-4 py-3.5 rounded-lg border-b-2 border-transparent">
+<span class="material-symbols-outlined text-stone-400 text-lg">lock</span>
+<span class="text-sm font-medium text-stone-500">joao.manuel@email.ao</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Nome Completo -->
+<div class="space-y-2">
+<label class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Nome Completo</label>
+<input class="w-full bg-surface-container-lowest border-none border-b-2 border-outline-variant/20 focus:border-primary-container focus:ring-0 p-0 py-2.5 text-base font-semibold text-on-surface placeholder-stone-300" type="text" value="Joao Manuel"/>
+</div>
+<!-- Telefone -->
+<div class="space-y-2">
+<label class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Telefone de Contacto</label>
+<input class="w-full bg-surface-container-lowest border-none border-b-2 border-outline-variant/20 focus:border-primary-container focus:ring-0 p-0 py-2.5 text-base font-semibold text-on-surface placeholder-stone-300" type="tel" value="+244 923 000 000"/>
+</div>
+</div>
+<!-- Localização -->
+<div class="space-y-2">
+<label class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Localização Principal</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none border-b-2 border-outline-variant/20 focus:border-primary-container focus:ring-0 p-0 py-2.5 text-base font-semibold text-on-surface placeholder-stone-300 pr-10" type="text" value="Fazenda Esperança, Huambo"/>
+<span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-tertiary">map</span>
+</div>
+<div class="mt-4 rounded-lg overflow-hidden h-32 relative">
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="stylized map view of a fertile agricultural valley with green plots and rural roads in artistic topographical style" data-location="Huambo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMIm3oiZkZXZHzUqOgN5fOHiWVAarqtMTRZFSpBeJOw3Eb-dEvP7nc9sfTqTagbWHzHCEfL0hAOi81rNgvWT3g2yV1boTWdlzbC32eZKB8bCIWUcHAUfS3dp67JRsUEBLUsHiUNmGPxLbTUVddUcytvV05d7x68fxMp-bioB2Xd5o_Hfly4vfCAVqGoA8qVfQSa-fahbP9FCn-9WXwFCSlDXxOcQ4VwBsflT_ZlrTivjALIBPM2QRIPB3mAb37WFUPF0xAj86cJBJJ"/>
+<div class="absolute inset-0 bg-primary/5"></div>
+</div>
+</div>
+</form>
+</div>
+<!-- Secondary Contextual Card: Activity/Status -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Profile Type Summary -->
+<div class="bg-surface-container-low rounded-xl p-8 border border-outline-variant/10 relative overflow-hidden">
+<div class="absolute -bottom-4 -right-4">
+<span class="material-symbols-outlined text-8xl text-primary/5 rotate-12">potted_plant</span>
+</div>
+<h4 class="text-sm font-extrabold text-on-surface mb-4">Perfil de Agricultor</h4>
+<p class="text-sm text-stone-600 leading-relaxed mb-6">
+                                Como agricultor verificado no ecossistema Makini, você tem acesso direto a sementes certificadas, maquinaria pesada e consultoria técnica especializada. Sua jornada no campo é o nosso motor.
+                            </p>
+<a class="inline-flex items-center gap-2 text-xs font-bold text-primary group" href="#">
+                                EXPLORAR MARKETPLACE
+                                <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+</a>
+</div>
+<!-- The Harvest Timeline Concept -->
+<div class="p-4 space-y-6">
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-primary-container"></div>
+<div class="w-0.5 h-full bg-outline-variant/40"></div>
+</div>
+<div class="pb-6">
+<p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Última Atividade</p>
+<p class="text-sm font-semibold text-on-surface">Reserva de Fertilizantes NPK</p>
+<p class="text-[11px] text-stone-500">Ontem às 14:20 • Huambo Logística</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-outline-variant"></div>
+<div class="w-0.5 h-full bg-outline-variant/40"></div>
+</div>
+<div class="pb-6">
+<p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Histórico</p>
+<p class="text-sm font-semibold text-stone-500">Perfil Verificado pelo Admin</p>
+<p class="text-[11px] text-stone-400">12 Out, 2023</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Navigation (BottomNavBar suppression check: rendered for top-level flow) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface-container-lowest glass-panel flex justify-around items-center py-3 border-t border-outline-variant/10 z-50">
+<button class="flex flex-col items-center gap-1 text-stone-400">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-stone-400">
+<span class="material-symbols-outlined">storefront</span>
+<span class="text-[10px] font-bold">Loja</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-[10px] font-bold">Perfil</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-stone-400">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Ajustes</span>
+</button>
+</nav>
+</body></html>
