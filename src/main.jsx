@@ -9,6 +9,7 @@ import Login from './pages/auth/Login.jsx'
 import SearchListings from './pages/feed/SearchListings.jsx'
 import DashboardFornecedor from './pages/dashboard/Fornecedor.jsx'
 import DashboardAgricultor from './pages/dashboard/Agricultor.jsx'
+import Profile from './pages/dashboard/Profile.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')).render(
                         <Route path="buscar" element={<SearchListings />} />
                         <Route path="dashboard" element={<DashboardFornecedor />} />
                         <Route path="minhas-reservas" element={<DashboardAgricultor />} />
+                        <Route path="perfil" element={<Profile />} />
                         <Route path="*" element={<div className="p-8 text-center text-makini-earth font-heading text-2xl">Em construção...</div>} />
                     </Route>
                 </Routes>
