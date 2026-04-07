@@ -159,6 +159,33 @@ export default function DashboardFornecedor() {
         );
     };
 
+
+    const uploadImage = async (file) => {
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('A imagem é demasiado grande. Máximo permitido: 5MB.');
+            return { error: new Error('File too large') };
+        }
+
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        const fileName = `listing-${user.id}-${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from('listings')
+            .upload(fileName, file, { upsert: true });
+
+        if (uploadError) {
+            console.error('Erro ao fazer upload da imagem:', uploadError);
+            toast.error(`Erro no upload: ${uploadError.message}`);
+            return { error: uploadError };
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('listings')
+            .getPublicUrl(fileName);
+
+        return { url: publicUrl };
+    };
+
     const handleCreateListing = async (e) => {
         e.preventDefault();
         setIsSubmittingListing(true);
@@ -167,32 +194,12 @@ export default function DashboardFornecedor() {
 
         // Upload image to Supabase Storage if a file was selected
         if (imagemArquivo) {
-            // Validate file size (max 5MB)
-            if (imagemArquivo.size > 5 * 1024 * 1024) {
-                toast.error('A imagem é demasiado grande. Máximo permitido: 5MB.');
+            const { url, error } = await uploadImage(imagemArquivo);
+            if (error) {
                 setIsSubmittingListing(false);
                 return;
             }
-
-            const fileExt = imagemArquivo.name.split('.').pop().toLowerCase();
-            const fileName = `listing-${user.id}-${Date.now()}.${fileExt}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('listings')
-                .upload(fileName, imagemArquivo, { upsert: true });
-
-            if (uploadError) {
-                console.error('Erro ao fazer upload da imagem:', uploadError);
-                toast.error(`Erro no upload: ${uploadError.message}`);
-                setIsSubmittingListing(false);
-                return;
-            }
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('listings')
-                .getPublicUrl(fileName);
-
-            imagem_url = publicUrl;
+            imagem_url = url;
         }
 
         const { data, error } = await supabase
@@ -240,31 +247,12 @@ export default function DashboardFornecedor() {
 
         // Upload new image if selected
         if (imagemEditArquivo) {
-            if (imagemEditArquivo.size > 5 * 1024 * 1024) {
-                toast.error('A imagem é demasiado grande. Máximo permitido: 5MB.');
+            const { url, error } = await uploadImage(imagemEditArquivo);
+            if (error) {
                 setIsSubmittingEdit(false);
                 return;
             }
-
-            const fileExt = imagemEditArquivo.name.split('.').pop().toLowerCase();
-            const fileName = `listing-${user.id}-${Date.now()}.${fileExt}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('listings')
-                .upload(fileName, imagemEditArquivo, { upsert: true });
-
-            if (uploadError) {
-                console.error('Erro ao fazer upload da imagem:', uploadError);
-                toast.error(`Erro no upload: ${uploadError.message}`);
-                setIsSubmittingEdit(false);
-                return;
-            }
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('listings')
-                .getPublicUrl(fileName);
-
-            imagem_url = publicUrl;
+            imagem_url = url;
         }
 
         const { data, error } = await supabase
