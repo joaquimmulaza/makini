@@ -30,12 +30,15 @@ async function createCategories() {
             'Colheita'
         ];
 
-        for (const nome of categorias) {
+        if (categorias.length > 0) {
+            const valuesParams = categorias.map((_, i) => `($${i + 1})`).join(', ');
             await client.query(
-                `INSERT INTO public.categorias (nome) VALUES ($1) ON CONFLICT (nome) DO NOTHING;`,
-                [nome]
+                `INSERT INTO public.categorias (nome) VALUES ${valuesParams} ON CONFLICT (nome) DO NOTHING;`,
+                categorias
             );
-            console.log(`  ✓ Categoria inserida: ${nome}`);
+            for (const nome of categorias) {
+                console.log(`  ✓ Categoria inserida: ${nome}`);
+            }
         }
 
         // Habilitar RLS e criar policy de leitura pública
